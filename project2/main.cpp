@@ -140,6 +140,7 @@ void view(const Song song_db[]) {
     // hope).
     if(!song_db[i].print())
       break;
+    std::cout << "Index: " << i << '\n'; // this is pretty ugly and hacky.
   }
 }
 
