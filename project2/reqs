@@ -1,0 +1,63 @@
+[ ] character arrays and <cstring>
+
+[ ] struct(/class) to model composite data type
+
+[ ] use array of objects to model a collection (?)
+
+[ ] file i/o
+
+keep track of a relatively small music library
+load song information from data file when app started
+
+[ ] view
+[ ] add
+[ ] remove
+[ ] search
+[ ] for songs
+[ ] save data to same file when program exits
+
+[ ] interactive text based menu interface
+
+[ ] enter information for a new song
+
+[ ] display information for all songs in db with index
+
+[ ] remove song by index
+
+[ ] search for songs by a certain artist
+
+[ ] search for songs by a certain album
+
+[ ] quit
+
+each song needs
+title
+artist
+duration (mm(delim)ss)
+album
+
+[ ] load "songs.txt" into memory
+
+title;artist;minute;second;album
+
+[ ] at least four function with arguments
+
+[ ] struct named Song
+
+[ ] array of structs to model collection of songs
+
+================ EXTRAS ================
+
+[ ] search by song name
+
+[ ] search by time
+
+[ ] regex search (search for "justin*" will return "justin bieber" and "justin
+      timberlake")
+
+[ ] store delta of changes in memory or local file for recovery when program
+      ends unexpectedly
+
+[ ] diff algorithm implementation might be necessary. Would love to use diff and
+      patch but I doubt that would be allowed. These also make it
+      system-specific
