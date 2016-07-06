@@ -43,7 +43,7 @@ title;artist;minute;second;album
 
 [ ] at least four function with arguments
 
-[ ] struct named Song
+[x] struct named Song
 
 [ ] array of structs to model collection of songs
 
