@@ -28,13 +28,24 @@ struct Song {
   // using an unsigned int instead. No system running this program will actually
   // have very constrained memory usage or disk space.
   char album[MAX_SONG_STRING];
+  bool print() const;
+  bool isPopulated;
 };
+
+bool Song::print() const {
+  if (!isPopulated) return false;
+  std::cout << "Title: " << this->title << '\n'
+  << "Arist: " << this->artist << '\n'
+  << "Duration: " << this->minutes << ':' << this->seconds << '\n'
+  << "Album: " << this->album << '\n';
+  return true;
+}
 
 char doMenu();
 void add();
 void remove();
 void search();
-void view();
+void view(const Song[]);
 // not sure if I need an explicit `quit` function.
 // after thought: I will probably use it to hold all the "cleanup" logic.
 // additionally, ideally I think if this was in a destructor all the cleanup
@@ -64,7 +75,7 @@ int main() {
         break;
         
       case 'v':
-        view();
+        view(songs);
         break;
         
       default:
@@ -118,8 +129,18 @@ void search() {
   std::cout << "search\n";
 }
 
-void view() {
-  std::cout << "view\n";
+// This would be nice if I could have something similar to more/less, but that
+// would be a lot of work.
+void view(const Song song_db[]) {
+  for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
+    // To save cycles, as soon as Song.print() returns false (meaning the
+    // current object's `isPopulated` field is false), break out of the loop and
+    // stop all attempts at printing the song. This assumes there will never be
+    // any breaks in the song db, which seems like a reasonable assumption (or
+    // hope).
+    if(!song_db[i].print())
+      break;
+  }
 }
 
 void quit() {
@@ -184,6 +205,7 @@ void loadFile(Song song_db[], const char delim) {
       case ALBUM:
         std::strncpy(song_db[i].album, in, MAX_SONG_STRING);
         fsm = TITLE;
+        song_db[i].isPopulated = true;
         // XXX: I hate this.
         if (f.peek() == '\n') { // using peek and panicking is reasonable.
           f.get(); // consume newline.
