@@ -1,0 +1,21 @@
+Would chunking be effective for low-memory low-disk usage?
+  Probably not - for any searches, the entire file needs to be searched in
+  the worsy case scenario. Or I could just plan for the best or average
+  case.
+
+How to structure the file
+  song;artists;min;sec;album
+  How to search? What algorithm? A sorted array would lend itself well to a
+  binary search, but does the cost of maintaining the sorted array force a
+  different approach?
+
+Look into vim's .swp file
+  Could it be useful to save deltas of updates that would live in memory
+  into the .swp file so that in the occurance of a crash, it could at least
+  prompt the user at the next run that there was an error and ask if they
+  want to attempt to fix the issue (possibly show a line by line update of
+  what's happening, by making the .diff slightly nicer).
+
+Can `diff` keep things in order?
+  Would the cost of maintaining an ordered array be so high it wouldn't
+  justify the use of a sorted array for use of quick binary search?
