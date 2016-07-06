@@ -2,6 +2,11 @@
 #include <cstring>
 #include <limits>
 
+// I don't like the size restriction for this, but it will have to do. Unless I
+// just read in forever until a delimiter is found. But that would get super
+// K&R, which I don't know if I want to do.
+#define MAX_SONG_STRING 1000
+
 char doMenu();
 void add();
 void remove();
@@ -12,6 +17,21 @@ void view();
 // additionally, ideally I think if this was in a destructor all the cleanup
 // logic would be handled by the runtime for me, which would be nice.
 void quit();
+
+// private is best
+class Song {
+  // I could model this object better and define a destructor that would do all
+  // the cleanup for me for free. This would probably be my favorite approach,
+  // but it would require remodelling the whole program flow, most likely. For
+  // now I will be much more rudimentary.
+  char title[MAX_SONG_STRING];
+  char artist[MAX_SONG_STRING];
+  unsigned int minutes; // Although it's highly unlikely, using an int instead
+                        // of a char allows for songs longer than 255 minutes.
+  unsigned char seconds; // Seconds are forced into a range of 0-59, which means
+                         // the smallest type to contain it is an unsigned char.
+  char album[MAX_SONG_STRING];
+};
 
 int main() {
   char input;
