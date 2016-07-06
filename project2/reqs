@@ -37,7 +37,7 @@ artist
 duration (mm(delim)ss)
 album
 
-[ ] load "songs.txt" into memory
+[x] load "songs.txt" into memory
 
 title;artist;minute;second;album
 
