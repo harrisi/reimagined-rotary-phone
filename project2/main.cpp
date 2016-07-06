@@ -2,11 +2,8 @@
 #include <cstring>
 #include <limits>
 #include <fstream>
+#include "libian.hpp"
 
-// I don't like the size restriction for this, but it will have to do. Unless I
-// just read in forever until a delimiter is found. But that would get super
-// K&R, which I don't know if I want to do.
-#define MAX_SONG_STRING 1000
 // maximum amount of songs possible. I might try increasing this to 50k to mimic
 // Google Play Music's capacity.
 #define MAX_SONG_DB_SIZE 2000
@@ -17,8 +14,8 @@ struct Song {
   // the cleanup for me for free. This would probably be my favorite approach,
   // but it would require remodelling the whole program flow, most likely. For
   // now I will be much more rudimentary.
-  char title[MAX_SONG_STRING];
-  char artist[MAX_SONG_STRING];
+  char title[MAX_STRING_SIZE];
+  char artist[MAX_STRING_SIZE];
   unsigned int minutes; // Although it's highly unlikely, using an int instead
   // of a char allows for songs longer than 255 minutes.
   unsigned int seconds; // Seconds are forced into a range of 0-59, which means
@@ -27,9 +24,14 @@ struct Song {
   // in some logic for reading in from a file is causing issues, so I'm just
   // using an unsigned int instead. No system running this program will actually
   // have very constrained memory usage or disk space.
-  char album[MAX_SONG_STRING];
+  char album[MAX_STRING_SIZE];
   bool print() const;
   bool isPopulated;
+};
+
+struct SongDB {
+  Song songs[MAX_SONG_DB_SIZE];
+  void insert(Song);
 };
 
 bool Song::print() const {
@@ -45,7 +47,7 @@ char doMenu();
 void add();
 void remove();
 void search();
-void view(const Song[]);
+void view(const SongDB);
 // not sure if I need an explicit `quit` function.
 // after thought: I will probably use it to hold all the "cleanup" logic.
 // additionally, ideally I think if this was in a destructor all the cleanup
@@ -53,12 +55,13 @@ void view(const Song[]);
 void quit();
 
 // May want to move elsewhere and abstract away some of the details.
-void loadFile(Song[], const char = ';');
+void loadFile(SongDB, const char = ';');
 
 int main() {
   char input;
   std::cout << "Welcome to Ian's music library program!\n";
-  Song songs[MAX_SONG_DB_SIZE];
+  SongDB songs;
+  //Song songs[MAX_SONG_DB_SIZE];
   loadFile(songs);
   while ((input = doMenu()) != 'q') {
     switch (tolower(input)) {
@@ -117,7 +120,15 @@ char doMenu() {
   return res;
 }
 
-void add() {
+void add(SongDB song_db) {
+  char buf[MAX_STRING_SIZE];
+  // I think I'll be able to abstract away the reading of information from
+  // loadFile to some function ("songFromStream" or the like) which reads in a
+  // stream of delimeter separated values from a stringstream and adds a song
+  // object to the db passed to it.
+  std::cout << "Song title: ";
+  std::cin.get(buf, MAX_STRING_SIZE - 1);
+  //song_db
   std::cout << "add\n";
 }
 
@@ -131,14 +142,14 @@ void search() {
 
 // This would be nice if I could have something similar to more/less, but that
 // would be a lot of work.
-void view(const Song song_db[]) {
+void view(const SongDB song_db) {
   for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
     // To save cycles, as soon as Song.print() returns false (meaning the
     // current object's `isPopulated` field is false), break out of the loop and
     // stop all attempts at printing the song. This assumes there will never be
     // any breaks in the song db, which seems like a reasonable assumption (or
     // hope).
-    if(!song_db[i].print())
+    if(!song_db.songs[i].print())
       break;
     std::cout << "Index: " << i << '\n'; // this is pretty ugly and hacky.
   }
@@ -148,7 +159,7 @@ void quit() {
   std::cout << "quit\n";
 }
 
-void loadFile(Song song_db[], const char delim) {
+void loadFile(SongDB song_db, const char delim) {
   enum Items {
     TITLE,
     ARTIST,
@@ -156,7 +167,7 @@ void loadFile(Song song_db[], const char delim) {
     SECONDS,
     ALBUM
   };
-  char in[MAX_SONG_STRING];
+  char in[MAX_STRING_SIZE];
   std::ifstream f;
   Items fsm = TITLE;
   int i = 0;
@@ -171,7 +182,7 @@ void loadFile(Song song_db[], const char delim) {
   // get until delim
   // This needs to check for the case of a newline. How to do this will be
   // potentially tricky.
-  while (f.get(in, MAX_SONG_STRING, delim) ||
+  while (f.get(in, MAX_STRING_SIZE, delim) ||
          i <= MAX_SONG_DB_SIZE) {
     if (f.eof()) break; // got to EOF, break.
     if(f.peek() == delim) {
@@ -184,29 +195,29 @@ void loadFile(Song song_db[], const char delim) {
     // title;artist;mm;ss;album
     switch (fsm) {
       case TITLE:
-        std::strncpy(song_db[i].title, in, MAX_SONG_STRING);
+        std::strncpy(song_db.songs[i].title, in, MAX_STRING_SIZE);
         fsm = ARTIST;
         break;
         
       case ARTIST:
-        std::strncpy(song_db[i].artist, in, MAX_SONG_STRING);
+        std::strncpy(song_db.songs[i].artist, in, MAX_STRING_SIZE);
         fsm = MINUTES;
         break;
         
       case MINUTES:
-        song_db[i].minutes = static_cast<unsigned int>(atoi(in));
+        song_db.songs[i].minutes = static_cast<unsigned int>(atoi(in));
         fsm = SECONDS;
         break;
         
       case SECONDS:
-        song_db[i].seconds = static_cast<unsigned int>(atoi(in));
+        song_db.songs[i].seconds = static_cast<unsigned int>(atoi(in));
         fsm = ALBUM;
         break;
         
       case ALBUM:
-        std::strncpy(song_db[i].album, in, MAX_SONG_STRING);
+        std::strncpy(song_db.songs[i].album, in, MAX_STRING_SIZE);
         fsm = TITLE;
-        song_db[i].isPopulated = true;
+        song_db.songs[i].isPopulated = true;
         // XXX: I hate this.
         if (f.peek() == '\n') { // using peek and panicking is reasonable.
           f.get(); // consume newline.
