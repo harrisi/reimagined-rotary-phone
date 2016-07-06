@@ -14,8 +14,6 @@
 // K&R, which I don't know if I want to do.
 #define MAX_STRING_SIZE 1000
 
-#include <iostream>
-
 void getString();
 
 #endif /* libian_hpp */
