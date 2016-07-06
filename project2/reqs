@@ -13,10 +13,11 @@ load song information from data file when app started
 [ ] add
 [ ] remove
 [ ] search
-[ ] for songs
+for songs
+
 [ ] save data to same file when program exits
 
-[ ] interactive text based menu interface
+[x] interactive text based menu interface
 
 [ ] enter information for a new song
 
