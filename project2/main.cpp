@@ -21,8 +21,12 @@ struct Song {
   char artist[MAX_SONG_STRING];
   unsigned int minutes; // Although it's highly unlikely, using an int instead
   // of a char allows for songs longer than 255 minutes.
-  unsigned char seconds; // Seconds are forced into a range of 0-59, which means
+  unsigned int seconds; // Seconds are forced into a range of 0-59, which means
   // the smallest type to contain it is an unsigned char.
+  // Unforunately I don't care to figure out why casting to an unsigned char
+  // in some logic for reading in from a file is causing issues, so I'm just
+  // using an unsigned int instead. No system running this program will actually
+  // have very constrained memory usage or disk space.
   char album[MAX_SONG_STRING];
 };
 
@@ -132,10 +136,8 @@ void loadFile(Song song_db[], const char delim) {
   };
   char in[MAX_SONG_STRING];
   std::ifstream f;
-  //Song song_db[MAX_SONG_DB_SIZE];
-  Items fsm = Items::TITLE;
+  Items fsm = TITLE;
   int i = 0;
-  char next = '\0';
   f.open("songs.txt");
   
   if (!f.is_open()) {
@@ -147,12 +149,9 @@ void loadFile(Song song_db[], const char delim) {
   // get until delim
   // This needs to check for the case of a newline. How to do this will be
   // potentially tricky.
-  while (//!(f.eof()) ||
-         (next = f.peek()) == '\n' || // I don't think this will work as I want..
-         f.get(in, MAX_SONG_STRING, delim) ||
-         i >= MAX_SONG_DB_SIZE) {
-    if (f.eof()) break;
-    if (next == '\n') i++; // increment index.
+  while (f.get(in, MAX_SONG_STRING, delim) ||
+         i <= MAX_SONG_DB_SIZE) {
+    if (f.eof()) break; // got to EOF, break.
     if(f.peek() == delim) {
       f.get(); // consume delimiter
     } else { // next char isn't delim, panic (this shouldn't happen)
@@ -162,30 +161,42 @@ void loadFile(Song song_db[], const char delim) {
     // assign tokens to values by column
     // title;artist;mm;ss;album
     switch (fsm) {
-      case Items::TITLE:
+      case TITLE:
         std::strncpy(song_db[i].title, in, MAX_SONG_STRING);
-        fsm = Items::ARTIST;
+        fsm = ARTIST;
         break;
         
-      case Items::ARTIST:
+      case ARTIST:
         std::strncpy(song_db[i].artist, in, MAX_SONG_STRING);
-        fsm = Items::MINUTES;
+        fsm = MINUTES;
         break;
         
-      case Items::MINUTES:
+      case MINUTES:
         song_db[i].minutes = static_cast<unsigned int>(atoi(in));
-        fsm = Items::SECONDS;
+        fsm = SECONDS;
         break;
         
-      case Items::SECONDS:
-        song_db[i].seconds = static_cast<unsigned char>(atoi(in));
-        fsm = Items::ALBUM;
+      case SECONDS:
+        song_db[i].seconds = static_cast<unsigned int>(atoi(in));
+        fsm = ALBUM;
         break;
         
-      case Items::ALBUM:
+      case ALBUM:
         std::strncpy(song_db[i].album, in, MAX_SONG_STRING);
-        fsm = Items::TITLE;
-        //i++; // this is the actual tracking of the index, which is super silly.
+        fsm = TITLE;
+        // XXX: I hate this.
+        if (f.peek() == '\n') { // using peek and panicking is reasonable.
+          f.get(); // consume newline.
+          i++; // this is the actual tracking of the index which seems silly.
+        } else {
+          if (f.peek() == EOF) { // this catches the case where the file doesn't
+                                 // contain a newline before EOF.
+            f.get();
+            break;
+          }
+          std::cerr << "Error in parser! Expected newline.\n";
+          exit(1); // XXX: Define error numbering properly.
+        }
         break;
         
       default:
