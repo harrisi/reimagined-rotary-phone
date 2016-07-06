@@ -19,3 +19,12 @@ Look into vim's .swp file
 Can `diff` keep things in order?
   Would the cost of maintaining an ordered array be so high it wouldn't
   justify the use of a sorted array for use of quick binary search?
+
+Fix reading in a file
+  Currently the final record needs an delimeter as well, which means the case
+  of a new item is signified by two delimiters (delim + '\n'), but the newline
+  can be sufficient information for a new record. I just need to figure out how
+  to read until a newline or semicolon.
+    I think I could just change the delimeter in the FSM, but this seems messy.
+    Alternatively I could just unget some chars until the newline. I don't know
+    how slow this would be, though.
