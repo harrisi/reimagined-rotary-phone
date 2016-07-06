@@ -44,10 +44,10 @@ bool Song::print() const {
 }
 
 char doMenu();
-void add();
+void add(SongDB&);
 void remove();
-void search();
-void view(const SongDB);
+void search(const SongDB&);
+void view(const SongDB&);
 // not sure if I need an explicit `quit` function.
 // after thought: I will probably use it to hold all the "cleanup" logic.
 // additionally, ideally I think if this was in a destructor all the cleanup
@@ -55,7 +55,7 @@ void view(const SongDB);
 void quit();
 
 // May want to move elsewhere and abstract away some of the details.
-void loadFile(SongDB, const char = ';');
+void loadFile(SongDB&, const char = ';');
 
 int main() {
   char input;
@@ -66,7 +66,7 @@ int main() {
   while ((input = doMenu()) != 'q') {
     switch (tolower(input)) {
       case 'a':
-        add();
+        add(songs);
         break;
         
       case 'r':
@@ -74,7 +74,7 @@ int main() {
         break;
         
       case 's':
-        search();
+        search(songs);
         break;
         
       case 'v':
@@ -120,7 +120,7 @@ char doMenu() {
   return res;
 }
 
-void add(SongDB song_db) {
+void add(SongDB& song_db) {
   char buf[MAX_STRING_SIZE];
   // I think I'll be able to abstract away the reading of information from
   // loadFile to some function ("songFromStream" or the like) which reads in a
@@ -136,13 +136,13 @@ void remove() {
   std::cout << "remove\n";
 }
 
-void search() {
+void search(const SongDB& song_db) {
   std::cout << "search\n";
 }
 
 // This would be nice if I could have something similar to more/less, but that
 // would be a lot of work.
-void view(const SongDB song_db) {
+void view(const SongDB& song_db) {
   for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
     // To save cycles, as soon as Song.print() returns false (meaning the
     // current object's `isPopulated` field is false), break out of the loop and
@@ -159,7 +159,7 @@ void quit() {
   std::cout << "quit\n";
 }
 
-void loadFile(SongDB song_db, const char delim) {
+void loadFile(SongDB& song_db, const char delim) {
   enum Items {
     TITLE,
     ARTIST,
@@ -170,7 +170,7 @@ void loadFile(SongDB song_db, const char delim) {
   char in[MAX_STRING_SIZE];
   std::ifstream f;
   Items fsm = TITLE;
-  int i = 0;
+  int i = 0; // this overwrites from the beginning every time.
   f.open("songs.txt");
   
   if (!f.is_open()) {
