@@ -9,7 +9,7 @@
 keep track of a relatively small music library
 load song information from data file when app started
 
-[ ] view
+[x] view
 [ ] add
 [ ] remove
 [ ] search
