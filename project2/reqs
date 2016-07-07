@@ -4,7 +4,7 @@
 
 [x] use array of objects to model a collection (?)
 
-[ ] file i/o
+[x] file i/o
 
 keep track of a relatively small music library
 load song information from data file when app started
