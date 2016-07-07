@@ -47,7 +47,7 @@ bool Song::print() const {
 
 char doMenu();
 void add(SongDB&);
-void remove();
+void remove(SongDB&);
 void search(const SongDB&);
 void view(const SongDB&);
 // not sure if I need an explicit `quit` function.
@@ -72,7 +72,7 @@ int main() {
         break;
         
       case 'r':
-        remove();
+        remove(songs);
         break;
         
       case 's':
@@ -174,8 +174,27 @@ void add(SongDB& song_db) {
   song_db.songs[song_db.items].isPopulated = true;
 }
 
-void remove() {
-  std::cout << "remove\n";
+// This should probably be a member function and then have another function
+// doRemove or something which would deal with all the specifics of prompting
+// or whatever. The member function would just take the index to be removed and
+// deal with all the organization of the db.
+void remove(SongDB& song_db) {
+  int input;
+  std::cout
+  << "Which song would you like to remove? (Numeric index, i.e., 42): ";
+  while ((input = getInt()) < 0 || input > song_db.items) {
+    std::cout << "Index out of range! Try again: ";
+  }
+  // could check if equal here for some extra cool maybe efficiency!
+  while (++input < song_db.items) {
+    std::strcpy(song_db.songs[input - 1].title, song_db.songs[input].title);
+    std::strcpy(song_db.songs[input - 1].artist, song_db.songs[input].artist);
+    song_db.songs[input - 1].minutes = song_db.songs[input].minutes;
+    song_db.songs[input - 1].seconds = song_db.songs[input].seconds;
+    std::strcpy(song_db.songs[input - 1].album, song_db.songs[input].album);
+  }
+  song_db.songs[song_db.items].isPopulated = false;
+  song_db.items--;
 }
 
 void search(const SongDB& song_db) {
@@ -213,7 +232,7 @@ void loadFile(SongDB& song_db, const char delim) {
   std::ifstream f;
   Items fsm = TITLE;
   //int i = 0; // this overwrites from the beginning every time.
-  f.open("songs.txt");
+  f.open("/Users/ian/misc/school/cs162/projects/project2/project2/songs.txt");
   
   if (!f.is_open()) {
     std::cerr << "Failed to load file.\n";
