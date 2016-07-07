@@ -11,7 +11,7 @@ load song information from data file when app started
 
 [x] view
 [x] add
-[ ] remove
+[x] remove
 [ ] search
 for songs
 
@@ -23,7 +23,7 @@ for songs
 
 [x] display information for all songs in db with index
 
-[ ] remove song by index
+[x] remove song by index
 
 [ ] search for songs by a certain artist
 
