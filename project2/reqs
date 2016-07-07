@@ -1,4 +1,4 @@
-[ ] character arrays and <cstring>
+[x] character arrays and <cstring>
 
 [x] struct(/class) to model composite data type
 
