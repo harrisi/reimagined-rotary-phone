@@ -41,7 +41,7 @@ album
 
 title;artist;minute;second;album
 
-[ ] at least four function with arguments
+[x] at least four function with arguments
 
 [x] struct named Song
 
