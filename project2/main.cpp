@@ -41,7 +41,7 @@ bool Song::print() const {
   std::cout << "Title: " << this->title << '\n'
   << "Arist: " << this->artist << '\n'
   << "Duration: " << this->minutes << ':' << this->seconds << '\n'
-  << "Album: " << this->album << '\n';
+  << "Album: " << this->album << "\n\n";
   return true;
 }
 
@@ -186,7 +186,7 @@ void remove(SongDB& song_db) {
     std::cout << "Index out of range! Try again: ";
   }
   // could check if equal here for some extra cool maybe efficiency!
-  while (++input < song_db.items) {
+  while (++input <= song_db.items) {
     std::strcpy(song_db.songs[input - 1].title, song_db.songs[input].title);
     std::strcpy(song_db.songs[input - 1].artist, song_db.songs[input].artist);
     song_db.songs[input - 1].minutes = song_db.songs[input].minutes;
@@ -205,6 +205,8 @@ void search(const SongDB& song_db) {
 // would be a lot of work.
 void view(const SongDB& song_db) {
   for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
+    if (i > song_db.items) break;
+      std::cout << "Index: " << i << '\n';
     // To save cycles, as soon as Song.print() returns false (meaning the
     // current object's `isPopulated` field is false), break out of the loop and
     // stop all attempts at printing the song. This assumes there will never be
@@ -212,7 +214,7 @@ void view(const SongDB& song_db) {
     // hope).
     if(!song_db.songs[i].print())
       break;
-    std::cout << "Index: " << i << '\n'; // this is pretty ugly and hacky.
+    //std::cout << "Index: " << i << '\n'; // this is pretty ugly and hacky.
   }
 }
 
@@ -232,7 +234,7 @@ void loadFile(SongDB& song_db, const char delim) {
   std::ifstream f;
   Items fsm = TITLE;
   //int i = 0; // this overwrites from the beginning every time.
-  f.open("/Users/ian/misc/school/cs162/projects/project2/project2/songs.txt");
+  f.open("songs.txt");
   
   if (!f.is_open()) {
     std::cerr << "Failed to load file.\n";
