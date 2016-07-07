@@ -10,7 +10,7 @@ keep track of a relatively small music library
 load song information from data file when app started
 
 [x] view
-[ ] add
+[x] add
 [ ] remove
 [ ] search
 for songs
@@ -19,7 +19,7 @@ for songs
 
 [x] interactive text based menu interface
 
-[ ] enter information for a new song
+[x] enter information for a new song
 
 [x] display information for all songs in db with index
 
