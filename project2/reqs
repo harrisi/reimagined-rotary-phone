@@ -2,7 +2,7 @@
 
 [ ] struct(/class) to model composite data type
 
-[ ] use array of objects to model a collection (?)
+[x] use array of objects to model a collection (?)
 
 [ ] file i/o
 
@@ -45,7 +45,7 @@ title;artist;minute;second;album
 
 [x] struct named Song
 
-[ ] array of structs to model collection of songs
+[x] array of structs to model collection of songs
 
 ================ EXTRAS ================
 
