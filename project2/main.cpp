@@ -25,7 +25,6 @@ struct Song {
   // using an unsigned int instead. No system running this program will actually
   // have very constrained memory usage or disk space.
   char album[MAX_STRING_SIZE];
-  bool print() const;
   bool isPopulated;
 };
 
@@ -33,15 +32,18 @@ struct SongDB {
   int items;
   Song songs[MAX_SONG_DB_SIZE];
   void insert(Song);
+  bool print(const int) const;
   void search();
 };
 
-bool Song::print() const {
-  if (!isPopulated) return false;
-  std::cout << "Title: " << this->title << '\n'
-  << "Arist: " << this->artist << '\n'
-  << "Duration: " << this->minutes << ':' << this->seconds << '\n'
-  << "Album: " << this->album << "\n\n";
+bool SongDB::print(const int index) const {
+  if (!songs[index].isPopulated) return false;
+  std::cout
+  << "Index: " << index << '\n'
+  << "Title: " << songs[index].title << '\n'
+  << "Arist: " << songs[index].artist << '\n'
+  << "Duration: " << songs[index].minutes << ':' << songs[index].seconds << '\n'
+  << "Album: " << songs[index].album << "\n\n";
   return true;
 }
 
@@ -54,7 +56,7 @@ void view(const SongDB&);
 // after thought: I will probably use it to hold all the "cleanup" logic.
 // additionally, ideally I think if this was in a destructor all the cleanup
 // logic would be handled by the runtime for me, which would be nice.
-void quit();
+void quit(const SongDB&);
 
 // May want to move elsewhere and abstract away some of the details.
 void loadFile(SongDB&, const char = ';');
@@ -89,11 +91,11 @@ int main() {
     }
   }
   // here: input == 'q'
-  quit(); // handles cleanup, which might be writing file to disk or applying
-          // a patch from the diff currently living in ".$1.swp" file. This
-          // will possibly be moved to an object destructor, since it allows
-          // the runtime to deal with all this nonsense in weird situations I
-          // don't want to plan for.
+  quit(songs); // handles cleanup, which might be writing file to disk or
+               // applying a patch from the diff currently living in ".$1.swp"
+               // file. This will possibly be moved to an object destructor,
+               // since it allows the runtime to deal with all this nonsense in
+               // weird situations I don't want to plan for.
   return 0;
 }
 
@@ -132,6 +134,7 @@ void getString(char *buf) {
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
+// Define a range, which would allow good use case for minutes and seconds.
 int getInt() {
   int res;
   while (!(std::cin >> res)) {
@@ -146,8 +149,6 @@ int getInt() {
 
 void add(SongDB& song_db) {
   char buf[MAX_STRING_SIZE];
-  // Make sure we maintain index correctness.
-  song_db.items++;
   
   // I think I'll be able to abstract away the reading of information from
   // loadFile to some function ("songFromStream" or the like) which reads in a
@@ -172,6 +173,9 @@ void add(SongDB& song_db) {
   std::strncpy(song_db.songs[song_db.items].album, buf, MAX_STRING_SIZE);
   
   song_db.songs[song_db.items].isPopulated = true;
+  
+  // Make sure we maintain index correctness.
+  song_db.items++;
 }
 
 // This should probably be a member function and then have another function
@@ -186,40 +190,61 @@ void remove(SongDB& song_db) {
     std::cout << "Index out of range! Try again: ";
   }
   // could check if equal here for some extra cool maybe efficiency!
-  while (++input <= song_db.items) {
+  while (++input < song_db.items) {
     std::strcpy(song_db.songs[input - 1].title, song_db.songs[input].title);
     std::strcpy(song_db.songs[input - 1].artist, song_db.songs[input].artist);
     song_db.songs[input - 1].minutes = song_db.songs[input].minutes;
     song_db.songs[input - 1].seconds = song_db.songs[input].seconds;
     std::strcpy(song_db.songs[input - 1].album, song_db.songs[input].album);
   }
-  song_db.songs[song_db.items].isPopulated = false;
-  song_db.items--;
+  song_db.songs[--song_db.items].isPopulated = false;
+  //song_db.items--;
 }
 
+// Should also be a member function, I think.
 void search(const SongDB& song_db) {
-  std::cout << "search\n";
+  // Decide how to search (assignment requires artist and album)
+  std::cout << "Search for artist or album? ";
+  
+  // By default, search all fields (artist, album, title). This would require
+  // an exact match, which I don't like. At the very least I will probably
+  // lowercase. I could also tokenize on ':' and have the option to format query
+  // like "artist: some artist" to search only for artist field.
+  // I also would like to have the ability to search for song duration:
+  // "time: > 4:20" would return all songs that have a duration greater than
+  // 4:20. This would be rather difficult, but would be super cool, I think.
 }
 
 // This would be nice if I could have something similar to more/less, but that
 // would be a lot of work.
 void view(const SongDB& song_db) {
+  // this could also just loop until i >= song_db.items..
   for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
-    if (i > song_db.items) break;
-      std::cout << "Index: " << i << '\n';
     // To save cycles, as soon as Song.print() returns false (meaning the
     // current object's `isPopulated` field is false), break out of the loop and
     // stop all attempts at printing the song. This assumes there will never be
     // any breaks in the song db, which seems like a reasonable assumption (or
     // hope).
-    if(!song_db.songs[i].print())
+    if(!song_db.print(i))
       break;
-    //std::cout << "Index: " << i << '\n'; // this is pretty ugly and hacky.
   }
 }
 
-void quit() {
-  std::cout << "quit\n";
+// Memory management (?), write to file, exit message. This will almost
+// certainly be moved to a destructor.
+void quit(const SongDB& song_db) {
+  std::ofstream f("songs.txt");
+  for (auto s : song_db.songs) {
+    // quit on first null entry.
+    if (!s.isPopulated) break;
+    f << s.title << ';'
+    << s.artist << ';'
+    << s.minutes << ';'
+    << s.seconds << ';'
+    << s.album << ";\n";
+  }
+  f.close();
+  //std::cout << "quit\n";
 }
 
 void loadFile(SongDB& song_db, const char delim) {
@@ -231,10 +256,10 @@ void loadFile(SongDB& song_db, const char delim) {
     ALBUM
   };
   char in[MAX_STRING_SIZE];
-  std::ifstream f;
+  std::ifstream f("songs.txt");
   Items fsm = TITLE;
   //int i = 0; // this overwrites from the beginning every time.
-  f.open("songs.txt");
+  //f.open;
   
   if (!f.is_open()) {
     std::cerr << "Failed to load file.\n";
