@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3C5AB5431D2DAC9F005239ED /* libian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C5AB5411D2DAC9F005239ED /* libian.cpp */; };
+		3C5AB5461D2E05AD005239ED /* vecian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C5AB5441D2E05AD005239ED /* vecian.cpp */; };
 		3CF31AC71D2272F000A4F4D2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3CF31AC61D2272F000A4F4D2 /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,8 @@
 		3C5AB53A1D2D89C4005239ED /* songs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = songs.txt; sourceTree = "<group>"; };
 		3C5AB5411D2DAC9F005239ED /* libian.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = libian.cpp; sourceTree = "<group>"; };
 		3C5AB5421D2DAC9F005239ED /* libian.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = libian.hpp; sourceTree = "<group>"; };
+		3C5AB5441D2E05AD005239ED /* vecian.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vecian.cpp; sourceTree = "<group>"; };
+		3C5AB5451D2E05AD005239ED /* vecian.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = vecian.hpp; sourceTree = "<group>"; };
 		3CF31AC31D2272F000A4F4D2 /* project2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = project2; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CF31AC61D2272F000A4F4D2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -65,6 +68,8 @@
 			children = (
 				3C5AB5411D2DAC9F005239ED /* libian.cpp */,
 				3C5AB5421D2DAC9F005239ED /* libian.hpp */,
+				3C5AB5441D2E05AD005239ED /* vecian.cpp */,
+				3C5AB5451D2E05AD005239ED /* vecian.hpp */,
 				3C5AB5381D2C9652005239ED /* ideas */,
 				3CF31AC61D2272F000A4F4D2 /* main.cpp */,
 				3C5AB5391D2CC5E7005239ED /* reqs */,
@@ -130,6 +135,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C5AB5431D2DAC9F005239ED /* libian.cpp in Sources */,
+				3C5AB5461D2E05AD005239ED /* vecian.cpp in Sources */,
 				3CF31AC71D2272F000A4F4D2 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

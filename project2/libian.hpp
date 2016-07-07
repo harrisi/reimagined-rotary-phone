@@ -9,6 +9,8 @@
 #ifndef libian_hpp
 #define libian_hpp
 
+//#include "vecian.hpp"
+
 // I don't like the size restriction for this, but it will have to do. Unless I
 // just read in forever until a delimiter is found. But that would get super
 // K&R, which I don't know if I want to do.
