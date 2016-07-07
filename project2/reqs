@@ -15,7 +15,7 @@ load song information from data file when app started
 [ ] search
 for songs
 
-[ ] save data to same file when program exits
+[x] save data to same file when program exits
 
 [x] interactive text based menu interface
 
