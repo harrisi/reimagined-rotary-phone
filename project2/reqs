@@ -1,6 +1,6 @@
 [ ] character arrays and <cstring>
 
-[ ] struct(/class) to model composite data type
+[x] struct(/class) to model composite data type
 
 [x] use array of objects to model a collection (?)
 
