@@ -14,7 +14,7 @@
 // I don't like the size restriction for this, but it will have to do. Unless I
 // just read in forever until a delimiter is found. But that would get super
 // K&R, which I don't know if I want to do.
-#define MAX_STRING_SIZE 1000
+const int MAX_STRING_SIZE = 1000;
 
 void getString();
 

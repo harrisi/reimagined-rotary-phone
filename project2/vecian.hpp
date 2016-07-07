@@ -16,9 +16,9 @@
 // an exponential increase of size for a vector's size is typically a good idea,
 // but I don't know what a reasonable starting value would be. 64 actually still
 // seems relatively large, but maybe it's fine.
-#define VECIAN_START_SIZE 64
+const int VECIAN_START_SIZE = 64;
 // Completely arbitrary max size which will probably be removed.
-#define VECIAN_MAX_SIZE 50000
+const int VECIAN_MAX_SIZE = 50000;
 
 // Templated vec class that internally stores the items in an array.
 template <typename T>
