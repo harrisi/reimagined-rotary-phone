@@ -28,3 +28,22 @@ Fix reading in a file
     I think I could just change the delimeter in the FSM, but this seems messy.
     Alternatively I could just unget some chars until the newline. I don't know
     how slow this would be, though.
+
+Regex/predicate search
+  By default, search all fields (artist, album, title). This would require
+  an exact match, which I don't like. At the very least I will probably
+  lowercase. I could also tokenize on ':' and have the option to format query
+  like "artist: some artist" to search only for artist field.
+  I also would like to have the ability to search for song duration:
+  "time: > 4:20" would return all songs that have a duration greater than
+  4:20. This would be rather difficult, but would be super cool, I think.
+
+Full parser
+  Implementing a lower-level parser that reads character by character and can be
+  given a grammar would be really cool. I know basically nothing about this,
+  though, so it might be too much to implement over the weekend. It would be
+  used for reading data in from the file, reading time in a nicer way, as well
+  as search.
+    "... given a grammar ..." perhaps more realisitcally, be given a _context_,
+    i.e., 'search' or 'file' or 'time' or something of the sort. This would
+    dictate how it would actually parse text.
