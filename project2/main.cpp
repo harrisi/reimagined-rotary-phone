@@ -8,6 +8,15 @@
 // Google Play Music's capacity.
 const int MAX_SONG_DB_SIZE = 2000;
 
+// Move to Parser.
+enum Mode {
+  TITLE,
+  ARTIST,
+  TIME,
+  ALBUM,
+  OTHER // This won't be used, but I'm reserving it for now.
+};
+
 // private is best, but I don't want to deal with that right now.
 struct Song {
   // I could model this object better and define a destructor that would do all
@@ -31,9 +40,8 @@ struct Song {
 struct SongDB {
   int items;
   Song songs[MAX_SONG_DB_SIZE];
-  void insert(Song);
   bool print(const int) const;
-  void search();
+  bool search(const char*, Song[], const Mode = OTHER) const;
 };
 
 bool SongDB::print(const int index) const {
@@ -45,6 +53,55 @@ bool SongDB::print(const int index) const {
   << "Duration: " << songs[index].minutes << ':' << songs[index].seconds << '\n'
   << "Album: " << songs[index].album << "\n\n";
   return true;
+}
+
+bool SongDB::search(const char *query, Song results[], const Mode mode) const {
+  // How do I break up the query? if the query is "   john ", it should
+  // certainly trim the leading and trailing whitespace and then search for
+  // "john" in whatever mode is specified. Should it match if it's a substring?
+  // if it's an exact match? I don't have time to implement a real fuzzy string
+  // matching algorithm, so (mostly) exact matches will have to suffice. Simply,
+  // if the query is "JoHn," the case shouldn't matter. Already I have two
+  // steps: trim leading and trailing whitespace, lowercase characters. This
+  // naturally leads to other issues for more complex queries, however. If the
+  // query is "   JdoG the     maGnifi  cent   ", should I trim, lowercase, and
+  // then remove all superfluous whitespace, and then match? i.e., search for
+  // exact match of "jdog the magnifi cent"? Should I splut up those words and
+  // search for each one individually (which I don't have time for)? Should I
+  // remove all whitespace and search for "jdogthemagnificent"? This would also
+  // require whatever I do to the query to be done to each song in the db.
+  
+  // n.b., the above sentence may lead to having an additional field in each
+  // Song object which holds the "search" string representing the fields which
+  // are lowercase with whitespace (and potentially all non-alnum chars)
+  // stripped, which would mean I would only need to generate that value once,
+  // which keeps searching reasonably efficient.
+  
+  // Either way, clearly the searching for the assignment specifications will be
+  // rather barebones and not as nice as full-featured as I would like. Alas,
+  // there are only so many hours in the day.
+  switch (mode) {
+    case TITLE:
+      // search for title
+      break;
+      
+    case ARTIST:
+      // search for artist
+      break;
+      
+    case TIME:
+      // search for time. this will be fun!
+      break;
+      
+    case ALBUM:
+      // search for album
+      break;
+      
+    default:
+      // search for everything
+      break;
+  }
+  return false;
 }
 
 char doMenu();
@@ -205,15 +262,6 @@ void remove(SongDB& song_db) {
   //song_db.items--;
 }
 
-// Move to Parser.
-enum Mode {
-  TITLE,
-  ARTIST,
-  TIME,
-  ALBUM,
-  OTHER // This won't be used, but I'm reserving it for now.
-};
-
 Mode strToMode(const char* mode) {
   char lower[10];
   for (size_t i = 0; i < strlen(mode); i++) {
@@ -240,7 +288,12 @@ void doCommand(const char command) {
 }
 
 // Should also be a member function, I think.
-void search(const SongDB& song_db) {
+void search(const SongDB& song_db) { // should return something.
+  // I don't know if it should return an array of songs or a specific search
+  // object. A search object seems kind of nice. It would contain an array of
+  // Song objects and just be populated with search results. Handling indexing
+  // is a bit tricky, though.. For useful search purposes, it needs to show the
+  // index for the SongDB passed. Bleh.
   Mode mode = OTHER;
   char buf;
   char lookahead = -1;
@@ -291,6 +344,12 @@ void search(const SongDB& song_db) {
   }
   query[strlen(query)] = '\0';
   // tokenize query ?
+  
+  // This is where the actual searching would happen. Perhaps this is where we
+  // call song_db.search(query, mode = OTHER) which does.. something. The
+  // results will be rather messy.
+  
+  
   
   std::cout << "mode: ";
   switch (mode) {
