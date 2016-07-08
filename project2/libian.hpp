@@ -10,6 +10,7 @@
 #define libian_hpp
 
 #include <iostream>
+#include <limits>
 
 //#include "vecian.hpp"
 

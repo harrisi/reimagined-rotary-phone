@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstring>
 #include "libian.hpp"
 
 // Move to Parser.
