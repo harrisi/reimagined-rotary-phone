@@ -61,6 +61,10 @@ void quit(const SongDB&);
 // May want to move elsewhere and abstract away some of the details.
 void loadFile(SongDB&, const char = ';');
 
+void getString(char*);
+int getInt(const int = std::numeric_limits<int>::lowest(),
+           const int = std::numeric_limits<int>::max());
+
 int main() {
   char input;
   std::cout << "Welcome to Ian's music library program!\n";
@@ -135,9 +139,9 @@ void getString(char *buf) {
 }
 
 // Define a range, which would allow good use case for minutes and seconds.
-int getInt() {
+int getInt(const int min, const int max) {
   int res;
-  while (!(std::cin >> res)) {
+  while (!(std::cin >> res) || res < min || res > max) {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cout << "Invalid input! Try again: ";
@@ -163,10 +167,10 @@ void add(SongDB& song_db) {
   std::strncpy(song_db.songs[song_db.items].artist, buf, MAX_STRING_SIZE);
   
   std::cout << "Song minutes: ";
-  song_db.songs[song_db.items].minutes = getInt();
+  song_db.songs[song_db.items].minutes = getInt(0);
   
   std::cout << "Song seconds: ";
-  song_db.songs[song_db.items].seconds = getInt();
+  song_db.songs[song_db.items].seconds = getInt(0, 59);
   
   std::cout << "Song album: ";
   getString(buf);
@@ -286,6 +290,7 @@ void search(const SongDB& song_db) {
     }
   }
   query[strlen(query)] = '\0';
+  // tokenize query ?
   
   std::cout << "mode: ";
   switch (mode) {
