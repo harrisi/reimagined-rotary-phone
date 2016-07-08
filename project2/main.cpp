@@ -3,130 +3,21 @@
 #include <limits>
 #include <fstream>
 #include "libian.hpp"
-
-// maximum amount of songs possible. I might try increasing this to 50k to mimic
-// Google Play Music's capacity.
-const int MAX_SONG_DB_SIZE = 2000;
-
-// Move to Parser.
-enum Mode {
-  TITLE,
-  ARTIST,
-  TIME,
-  ALBUM,
-  OTHER // This won't be used, but I'm reserving it for now.
-};
-
-// private is best, but I don't want to deal with that right now.
-struct Song {
-  // I could model this object better and define a destructor that would do all
-  // the cleanup for me for free. This would probably be my favorite approach,
-  // but it would require remodelling the whole program flow, most likely. For
-  // now I will be much more rudimentary.
-  char title[MAX_STRING_SIZE];
-  char artist[MAX_STRING_SIZE];
-  unsigned int minutes; // Although it's highly unlikely, using an int instead
-  // of a char allows for songs longer than 255 minutes.
-  unsigned int seconds; // Seconds are forced into a range of 0-59, which means
-  // the smallest type to contain it is an unsigned char.
-  // Unforunately I don't care to figure out why casting to an unsigned char
-  // in some logic for reading in from a file is causing issues, so I'm just
-  // using an unsigned int instead. No system running this program will actually
-  // have very constrained memory usage or disk space.
-  char album[MAX_STRING_SIZE];
-  bool isPopulated;
-};
-
-struct SongDB {
-  int items;
-  Song songs[MAX_SONG_DB_SIZE];
-  bool print(const int) const;
-  bool search(const char*, Song[], const Mode = OTHER) const;
-};
-
-bool SongDB::print(const int index) const {
-  if (!songs[index].isPopulated) return false;
-  std::cout
-  << "Index: " << index << '\n'
-  << "Title: " << songs[index].title << '\n'
-  << "Arist: " << songs[index].artist << '\n'
-  << "Duration: " << songs[index].minutes << ':' << songs[index].seconds << '\n'
-  << "Album: " << songs[index].album << "\n\n";
-  return true;
-}
-
-bool SongDB::search(const char *query, Song results[], const Mode mode) const {
-  // How do I break up the query? if the query is "   john ", it should
-  // certainly trim the leading and trailing whitespace and then search for
-  // "john" in whatever mode is specified. Should it match if it's a substring?
-  // if it's an exact match? I don't have time to implement a real fuzzy string
-  // matching algorithm, so (mostly) exact matches will have to suffice. Simply,
-  // if the query is "JoHn," the case shouldn't matter. Already I have two
-  // steps: trim leading and trailing whitespace, lowercase characters. This
-  // naturally leads to other issues for more complex queries, however. If the
-  // query is "   JdoG the     maGnifi  cent   ", should I trim, lowercase, and
-  // then remove all superfluous whitespace, and then match? i.e., search for
-  // exact match of "jdog the magnifi cent"? Should I splut up those words and
-  // search for each one individually (which I don't have time for)? Should I
-  // remove all whitespace and search for "jdogthemagnificent"? This would also
-  // require whatever I do to the query to be done to each song in the db.
-  
-  // n.b., the above sentence may lead to having an additional field in each
-  // Song object which holds the "search" string representing the fields which
-  // are lowercase with whitespace (and potentially all non-alnum chars)
-  // stripped, which would mean I would only need to generate that value once,
-  // which keeps searching reasonably efficient.
-  
-  // Either way, clearly the searching for the assignment specifications will be
-  // rather barebones and not as nice as full-featured as I would like. Alas,
-  // there are only so many hours in the day.
-  switch (mode) {
-    case TITLE:
-      // search for title
-      break;
-      
-    case ARTIST:
-      // search for artist
-      break;
-      
-    case TIME:
-      // search for time. this will be fun!
-      break;
-      
-    case ALBUM:
-      // search for album
-      break;
-      
-    default:
-      // search for everything
-      break;
-  }
-  return false;
-}
+#include "Songs.hpp"
 
 char doMenu();
 void add(SongDB&);
 void remove(SongDB&);
 void search(const SongDB&);
 void view(const SongDB&);
-// not sure if I need an explicit `quit` function.
-// after thought: I will probably use it to hold all the "cleanup" logic.
-// additionally, ideally I think if this was in a destructor all the cleanup
-// logic would be handled by the runtime for me, which would be nice.
-void quit(const SongDB&);
 
 // May want to move elsewhere and abstract away some of the details.
 void loadFile(SongDB&, const char = ';');
-
-void getString(char*);
-int getInt(const int = std::numeric_limits<int>::lowest(),
-           const int = std::numeric_limits<int>::max());
 
 int main() {
   char input;
   std::cout << "Welcome to Ian's music library program!\n";
   SongDB songs;
-  //Song songs[MAX_SONG_DB_SIZE];
   loadFile(songs);
   while ((input = doMenu()) != 'q') {
     switch (tolower(input)) {
@@ -151,12 +42,7 @@ int main() {
         break;
     }
   }
-  // here: input == 'q'
-  quit(songs); // handles cleanup, which might be writing file to disk or
-               // applying a patch from the diff currently living in ".$1.swp"
-               // file. This will possibly be moved to an object destructor,
-               // since it allows the runtime to deal with all this nonsense in
-               // weird situations I don't want to plan for.
+  
   return 0;
 }
 
@@ -182,29 +68,6 @@ char doMenu() {
   std::cin.clear();
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   
-  return res;
-}
-
-void getString(char *buf) {
-  while(!std::cin.get(buf, MAX_STRING_SIZE - 1)) {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cout << "Invalid input! Try again: ";
-  }
-  std::cin.clear();
-  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
-// Define a range, which would allow good use case for minutes and seconds.
-int getInt(const int min, const int max) {
-  int res;
-  while (!(std::cin >> res) || res < min || res > max) {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cout << "Invalid input! Try again: ";
-  }
-  std::cin.clear();
-  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   return res;
 }
 
@@ -260,19 +123,6 @@ void remove(SongDB& song_db) {
   }
   song_db.songs[--song_db.items].isPopulated = false;
   //song_db.items--;
-}
-
-Mode strToMode(const char* mode) {
-  char lower[10];
-  for (size_t i = 0; i < strlen(mode); i++) {
-    lower[i] = tolower(mode[i]);
-  }
-  if (strncmp("title", lower, strlen(lower)) == 0) return TITLE;
-  if (strncmp("artist", lower, strlen(lower)) == 0) return ARTIST;
-  if (strncmp("time", lower, strlen(lower)) == 0) return TIME;
-  if (strncmp("album", lower, strlen(lower)) == 0) return ALBUM;
-  return OTHER; // This is necessary for the compiler with how the above series
-                // of returns are structured, but it will never be reached.
 }
 
 void doCommand(const char command) {
@@ -380,24 +230,6 @@ void view(const SongDB& song_db) {
     if(!song_db.print(i))
       break;
   }
-}
-
-// Memory management (?), write to file, exit message. This will almost
-// certainly be moved to a destructor.
-void quit(const SongDB& song_db) {
-  std::ofstream f("songs.txt");
-  for (auto s : song_db.songs) {
-    // quit on first unpopulated entry.
-    if (!s.isPopulated) break;
-    f << s.title << ';'
-    << s.artist << ';'
-    << s.minutes << ';'
-    << s.seconds << ';'
-    << s.album << ";\n";
-  }
-  f.close();
-  
-  std::cout << "\nThanks for using Ian's music manager!\n";
 }
 
 void loadFile(SongDB& song_db, const char delim) {

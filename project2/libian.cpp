@@ -8,12 +8,24 @@
 
 #include "libian.hpp"
 
-void getString() {
-//  char res[MAX_STRING_SIZE];
-//  while(!std::cin.get(res, std::numeric_limits<std::streamsize>::max())) {
-//    std::cin.clear();
-//    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//    std::cout << "Invalid input! Try again: ";
-//  }
-//  return res;
+void getString(char *buf) {
+  while(!std::cin.get(buf, MAX_STRING_SIZE - 1)) {
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Invalid input! Try again: ";
+  }
+  std::cin.clear();
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+int getInt(const int min, const int max) {
+  int res;
+  while (!(std::cin >> res) || res < min || res > max) {
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Invalid input! Try again: ";
+  }
+  std::cin.clear();
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  return res;
 }
