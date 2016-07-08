@@ -152,7 +152,7 @@ void add(SongDB& song_db) {
   
   // I think I'll be able to abstract away the reading of information from
   // loadFile to some function ("songFromStream" or the like) which reads in a
-  // stream of delimeter separated values from a stringstream and adds a song
+  // stream of delimiter separated values from a stringstream and adds a song
   // object to the db passed to it.
   std::cout << "Song title: ";
   getString(buf);
@@ -201,10 +201,51 @@ void remove(SongDB& song_db) {
   //song_db.items--;
 }
 
+// Move to Parser.
+enum Mode {
+  TITLE,
+  ARTIST,
+  TIME,
+  ALBUM,
+  OTHER // This won't be used, but I'm reserving it for now.
+};
+
+Mode strToMode(const char* mode) {
+  char lower[10];
+  for (size_t i = 0; i < strlen(mode); i++) {
+    lower[i] = tolower(mode[i]);
+  }
+  if (strncmp("title", lower, strlen(lower)) == 0) return TITLE;
+  if (strncmp("artist", lower, strlen(lower)) == 0) return ARTIST;
+  if (strncmp("time", lower, strlen(lower)) == 0) return TIME;
+  if (strncmp("album", lower, strlen(lower)) == 0) return ALBUM;
+  return OTHER; // This is necessary for the compiler with how the above series
+                // of returns are structured, but it will never be reached.
+}
+
+void doCommand(const char command) {
+  switch (command) {
+    case '?':
+      std::cout << "helpful message!\n";
+      break;
+      
+    default:
+      std::cout << "Command not found: " << command << '\n';
+      break;
+  }
+}
+
 // Should also be a member function, I think.
 void search(const SongDB& song_db) {
+  Mode mode = OTHER;
+  char buf;
+  char lookahead = -1;
+  bool startOf = true;
+  bool stop = false;
+  char query[MAX_STRING_SIZE] {0}; // holds actual query. This will exclude
+                                   // specific "category" to search for.
   // Decide how to search (assignment requires artist and album)
-  std::cout << "Search for artist or album? ";
+  //std::cout << "Search for artist or album? ";
   
   // By default, search all fields (artist, album, title). This would require
   // an exact match, which I don't like. At the very least I will probably
@@ -213,6 +254,53 @@ void search(const SongDB& song_db) {
   // I also would like to have the ability to search for song duration:
   // "time: > 4:20" would return all songs that have a duration greater than
   // 4:20. This would be rather difficult, but would be super cool, I think.
+  
+  std::cout << "Enter search query (or \":?\" for help): ";
+  // read input one by one
+  
+  while (!stop) {
+    if (lookahead != -1) {
+      buf = lookahead;
+      if ((lookahead = getchar()) == EOF ||
+          lookahead == '\n') stop = true;
+      startOf = false;
+    } else { // should only happen on first loop.
+      if ((buf = getchar()) == EOF || buf == '\n') break;
+      if ((lookahead = getchar()) == EOF || lookahead == '\n') stop = true;
+      //startOf = true; // this is in the wrong place.
+    }
+    switch (buf) {
+      case ':':
+        if (startOf) {
+          doCommand(lookahead);
+        } else {
+          mode = strToMode(query);
+          // clear query
+          std::memset(query, '\0', sizeof query);
+        }
+        break;
+        
+      default:
+        query[strlen(query)] = buf;
+        break;
+    }
+  }
+  query[strlen(query)] = '\0';
+  
+  std::cout << "mode: ";
+  switch (mode) {
+    case TITLE: std::cout << "title\n";
+      break;
+    case ARTIST: std::cout << "artist\n";
+      break;
+    case TIME: std::cout << "time\n";
+      break;
+    case ALBUM: std::cout << "album\n";
+      break;
+    default: std::cout << "other\n";
+      break;
+  }
+  std::cout << "query: " << query << '\n';
 }
 
 // This would be nice if I could have something similar to more/less, but that
@@ -235,7 +323,7 @@ void view(const SongDB& song_db) {
 void quit(const SongDB& song_db) {
   std::ofstream f("songs.txt");
   for (auto s : song_db.songs) {
-    // quit on first null entry.
+    // quit on first unpopulated entry.
     if (!s.isPopulated) break;
     f << s.title << ';'
     << s.artist << ';'
@@ -244,7 +332,8 @@ void quit(const SongDB& song_db) {
     << s.album << ";\n";
   }
   f.close();
-  //std::cout << "quit\n";
+  
+  std::cout << "\nThanks for using Ian's music manager!\n";
 }
 
 void loadFile(SongDB& song_db, const char delim) {
@@ -254,10 +343,10 @@ void loadFile(SongDB& song_db, const char delim) {
     MINUTES,
     SECONDS,
     ALBUM
-  };
+  } fsm = TITLE;
   char in[MAX_STRING_SIZE];
   std::ifstream f("songs.txt");
-  Items fsm = TITLE;
+  //Items fsm = TITLE;
   //int i = 0; // this overwrites from the beginning every time.
   //f.open;
   
