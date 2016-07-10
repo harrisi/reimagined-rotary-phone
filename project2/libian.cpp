@@ -29,3 +29,16 @@ int getInt(const int min, const int max) {
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   return res;
 }
+
+// I don't really like the naming, but whatever.
+void normalize(char *val) {
+  char *i = val;
+  char *j = val;
+  while (*j != '\0') {
+    *i = tolower(*j++);
+    if (!isspace(*i)) {
+      i++;
+    }
+  }
+  *i = '\0';
+}

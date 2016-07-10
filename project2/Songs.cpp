@@ -8,14 +8,41 @@
 
 #include "Songs.hpp"
 
+//Song::Song() {
+//}
+
+//MusicVal::MusicVal(const char name[]) {
+//  strncpy(value, name, MAX_STRING_SIZE);
+//  strncpy(_value, name, MAX_STRING_SIZE);
+//  normalize(_value);
+//}
+
+char* MusicVal::operator()() const {
+  return nullptr;
+}
+
+void MusicVal::operator()(const char *val) {
+  strncpy(value, val, MAX_STRING_SIZE);
+  strncpy(_value, val, MAX_STRING_SIZE);
+  normalize(_value);
+}
+
+bool Song::isPopulated() const {
+  return populated;
+}
+
+bool Song::isPopulated(bool p) {
+  return populated = p;
+}
+
 bool SongDB::print(const int index) const {
-  if (!songs[index].isPopulated) return false;
+  if (!songs[index].isPopulated()) return false;
   std::cout
   << "Index: " << index << '\n'
-  << "Title: " << songs[index].title << '\n'
-  << "Arist: " << songs[index].artist << '\n'
-  << "Duration: " << songs[index].minutes << ':' << songs[index].seconds << '\n'
-  << "Album: " << songs[index].album << "\n\n";
+  << "Title: " << songs[index].title() << '\n'
+  << "Arist: " << songs[index].artist() << '\n'
+  << "Duration: " << songs[index].minutes() << ':' << songs[index].seconds() << '\n'
+  << "Album: " << songs[index].album() << "\n\n";
   return true;
 }
 
@@ -61,23 +88,28 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       // search for album
       break;
       
-    default:
+    case OTHER:
       // search for everything
+      break;
+      
+    default:
+      // unknown search mode.
       break;
   }
   return false;
 }
 
 SongDB::~SongDB() {
-  std::ofstream f("songs.txt");
+  std::ofstream
+  f("/Users/ian/misc/school/cs162/projects/project2/project2/songs.txt");
   for (auto s : songs) {
     // quit on first unpopulated entry.
-    if (!s.isPopulated) break;
-    f << s.title << ';'
-    << s.artist << ';'
-    << s.minutes << ';'
-    << s.seconds << ';'
-    << s.album << ";\n";
+    if (!s.isPopulated()) break;
+    f << s.title() << ';'
+    << s.artist() << ';'
+    << s.minutes() << ';'
+    << s.seconds() << ';'
+    << s.album() << ";\n";
   }
   f.close();
   
@@ -95,4 +127,12 @@ Mode strToMode(const char* mode) {
   if (strncmp("album", lower, strlen(lower)) == 0) return ALBUM;
   return OTHER; // This is necessary for the compiler with how the above series
   // of returns are structured, but it will never be reached.
+}
+
+unsigned int Time::operator()() const {
+  return value;
+}
+
+void Time::operator()(const unsigned int val) {
+  value = val;
 }

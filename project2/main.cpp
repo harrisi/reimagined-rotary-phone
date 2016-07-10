@@ -17,7 +17,7 @@ void loadFile(SongDB&, const char = ';');
 int main() {
   char input;
   std::cout << "Welcome to Ian's music library program!\n";
-  SongDB songs;
+  SongDB songs{};
   loadFile(songs);
   while ((input = doMenu()) != 'q') {
     switch (tolower(input)) {
@@ -80,23 +80,26 @@ void add(SongDB& song_db) {
   // object to the db passed to it.
   std::cout << "Song title: ";
   getString(buf);
-  std::strncpy(song_db.songs[song_db.items].title, buf, MAX_STRING_SIZE);
+  song_db.songs[song_db.items].title(buf);
+  //std::strncpy(song_db.songs[song_db.items].title(), buf, MAX_STRING_SIZE);
   
   std::cout << "Song artist: ";
   getString(buf);
-  std::strncpy(song_db.songs[song_db.items].artist, buf, MAX_STRING_SIZE);
+  song_db.songs[song_db.items].artist(buf);
+  //std::strncpy(, buf, MAX_STRING_SIZE);
   
   std::cout << "Song minutes: ";
-  song_db.songs[song_db.items].minutes = getInt(0);
+  song_db.songs[song_db.items].minutes(getInt(0));
   
   std::cout << "Song seconds: ";
-  song_db.songs[song_db.items].seconds = getInt(0, 59);
+  song_db.songs[song_db.items].seconds(getInt(0, 59));
   
   std::cout << "Song album: ";
   getString(buf);
-  std::strncpy(song_db.songs[song_db.items].album, buf, MAX_STRING_SIZE);
+  song_db.songs[song_db.items].album(buf);
+  //std::strncpy(, buf, MAX_STRING_SIZE);
   
-  song_db.songs[song_db.items].isPopulated = true;
+  song_db.songs[song_db.items].isPopulated(true);
   
   // Make sure we maintain index correctness.
   song_db.items++;
@@ -115,13 +118,16 @@ void remove(SongDB& song_db) {
   }
   // could check if equal here for some extra cool maybe efficiency!
   while (++input < song_db.items) {
-    std::strcpy(song_db.songs[input - 1].title, song_db.songs[input].title);
-    std::strcpy(song_db.songs[input - 1].artist, song_db.songs[input].artist);
-    song_db.songs[input - 1].minutes = song_db.songs[input].minutes;
-    song_db.songs[input - 1].seconds = song_db.songs[input].seconds;
-    std::strcpy(song_db.songs[input - 1].album, song_db.songs[input].album);
+    song_db.songs[input - 1].title(song_db.songs[input].title());
+    //std::strcpy(, );
+    song_db.songs[input - 1].artist(song_db.songs[input].artist());
+    //std::strcpy(, );
+    song_db.songs[input - 1].minutes(song_db.songs[input].minutes());
+    song_db.songs[input - 1].seconds(song_db.songs[input].seconds());
+    song_db.songs[input - 1].album(song_db.songs[input].album());
+    //std::strcpy(, );
   }
-  song_db.songs[--song_db.items].isPopulated = false;
+  song_db.songs[--song_db.items].isPopulated(false);
   //song_db.items--;
 }
 
@@ -241,7 +247,8 @@ void loadFile(SongDB& song_db, const char delim) {
     ALBUM
   } fsm = TITLE;
   char in[MAX_STRING_SIZE];
-  std::ifstream f("songs.txt");
+  std::ifstream
+  f("/Users/ian/misc/school/cs162/projects/project2/project2/songs.txt");
   //Items fsm = TITLE;
   //int i = 0; // this overwrites from the beginning every time.
   //f.open;
@@ -268,29 +275,32 @@ void loadFile(SongDB& song_db, const char delim) {
     // title;artist;mm;ss;album
     switch (fsm) {
       case TITLE:
-        std::strncpy(song_db.songs[song_db.items].title, in, MAX_STRING_SIZE);
+        song_db.songs[song_db.items].title(in);
+        //std::strncpy(, in, MAX_STRING_SIZE);
         fsm = ARTIST;
         break;
         
       case ARTIST:
-        std::strncpy(song_db.songs[song_db.items].artist, in, MAX_STRING_SIZE);
+        song_db.songs[song_db.items].artist(in);
+        //std::strncpy(, in, MAX_STRING_SIZE);
         fsm = MINUTES;
         break;
         
       case MINUTES:
-        song_db.songs[song_db.items].minutes = static_cast<unsigned int>(atoi(in));
+        song_db.songs[song_db.items].minutes(static_cast<unsigned int>(atoi(in)));
         fsm = SECONDS;
         break;
         
       case SECONDS:
-        song_db.songs[song_db.items].seconds = static_cast<unsigned int>(atoi(in));
+        song_db.songs[song_db.items].seconds(static_cast<unsigned int>(atoi(in)));
         fsm = ALBUM;
         break;
         
       case ALBUM:
-        std::strncpy(song_db.songs[song_db.items].album, in, MAX_STRING_SIZE);
+        song_db.songs[song_db.items].album(in);
+        //std::strncpy(, in, MAX_STRING_SIZE);
         fsm = TITLE;
-        song_db.songs[song_db.items].isPopulated = true;
+        song_db.songs[song_db.items].isPopulated(true);
         // XXX: I hate this.
         if (f.peek() == '\n') { // using peek and panicking is reasonable.
           f.get(); // consume newline.

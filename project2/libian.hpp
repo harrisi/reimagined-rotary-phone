@@ -27,4 +27,6 @@ void getString(char*);
 int getInt(const int = std::numeric_limits<int>::lowest(),
            const int = std::numeric_limits<int>::max());
 
+void normalize(char*);
+
 #endif /* libian_hpp */
