@@ -59,7 +59,7 @@ char doMenu() {
   << "Selection> ";
   
   while (!(std::cin >> res)) {
-    if (std::cin.eof()) break; // hacky(?) way of dealing with Ctrl-D, although
+    if (std::cin.eof()) break; // Hacky(?) way of dealing with Ctrl-D, although
                                // only when no input preceeds Ctrl-D..
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -84,26 +84,23 @@ void add(SongDB& song_db) {
   std::cout << "Song title: ";
   getString(buf);
   song_db.songs[song_db.items].setTitle(buf);
-  //std::strncpy(song_db.songs[song_db.items].title, buf, MAX_STRING_SIZE);
   std::cout << "Song artist: ";
   
   getString(buf);
   song_db.songs[song_db.items].setArtist(buf);
-  //std::strncpy(song_db.songs[song_db.items].artist, buf, MAX_STRING_SIZE);
   
-  // Neat. But it doesn't actually have any code for maintaining useful times
-  // (i.e., 0 <= seconds < 60). Oh well. This is at least cool.
   std::cout << "Song duration (e.g. '4:20'): ";
   getString(buf);
   minutes = strtok(buf, ":");
   if (minutes != nullptr)
     seconds = strtok(nullptr, "\n");
-  while (minutes == nullptr ||
-         seconds == nullptr ||
-         !isInt(minutes) ||
-         !isInt(seconds) ||
-         atoi(seconds) < 0 ||
-         atoi(seconds) > 59) {
+  // Repeat..
+  while (minutes == nullptr || // ..if minutes is null..
+         seconds == nullptr || // ..or seconds is null..
+         !isInt(minutes) || // ..or minutes isn't an int..
+         !isInt(seconds) || // ..or seconds isn't an int..
+         atoi(seconds) < 0 || // ..or seconds is less than 0..
+         atoi(seconds) > 59) { // ..or seconds is greater than 59.
     std::cout << "Invalid input! Try again: ";
     getString(buf);
     minutes = strtok(buf, ":");
@@ -139,7 +136,7 @@ void remove(SongDB& song_db) {
   } // I don't like this because it forces the user to delete an item. If they
     // accidentally get here, they are forced to delete something or force exit
     // the program.
-  // could check if equal here for some extra cool maybe efficiency!
+  // Could check if equal here for some extra cool maybe efficiency!
   while (++input < song_db.items) {
     // As a consequence of the changes, I can now chain these methods for some
     // neat looking calls. Cool!
@@ -182,7 +179,7 @@ void doCommand(const char command) {
 }
 
 // Should also be a member function, I think.
-void search(const SongDB& song_db) { // should return something.
+void search(const SongDB& song_db) { // should return something (?)
   // I don't know if it should return an array of songs or a specific search
   // object. A search object seems kind of nice. It would contain an array of
   // Song objects and just be populated with search results. Handling indexing
@@ -218,49 +215,60 @@ void search(const SongDB& song_db) { // should return something.
   // "time: > 4:20" would return all songs that have a duration greater than
   // 4:20. This would be rather difficult, but would be super cool, I think.
   
-  std::cout << "Enter search query (or \":?\" for help): ";
-  // read input one by one
+  // The above was successfully implemented with great success!
   
+  std::cout << "Enter search query (or \":?\" for help): ";
+  
+  // Read input one by one. Store lookahead and use for EOL and such.
   while (!stop) {
-    if (lookahead != -1) {
+    if (lookahead != -1) { // If lookahead has usable value, use it.
       buf = lookahead;
-      if ((lookahead = getchar()) == EOF ||
+      if ((lookahead = getchar()) == EOF || // This fills lookahead again.
           lookahead == '\n') stop = true;
       startOf = false;
-    } else { // should only happen on first loop.
-      if ((buf = getchar()) == EOF || buf == '\n') break;
+    } else { // Should only happen on first loop.
+      if ((buf = getchar()) == EOF || buf == '\n') break; // Fill buf.
+      // Fill lookahead.
       stop = (lookahead = getchar()) == EOF || lookahead == '\n';
     }
     switch (buf) {
       case ':':
-        if (startOf) {
+        if (startOf) { // If ':' is the first character, it's a command. Use
+                       // lookahead as the command.
           doCommand(lookahead);
-        } else if (!modeset) {
-          mode = strToMode(query);
-          // clear query
-          memset(query, '\0', sizeof query);
-          modeset = true;
-        } else {
+          // This feels very weird, but the purpose of this is so that the user
+          // can use ':' after the mode. Time searching was giving me problems.
+          // In short, this allows for "time: > 4:20" without clobbering "time"
+          // as the mode.
+        } else if (!modeset) { // If mode hasn't been set, query is mode.
+          mode = strToMode(query); // Set mode to Mode value based on query.
+          memset(query, '\0', sizeof query); // Clear query.
+          modeset = true; // Mode has been set, will only happen once.
+        } else { // This only happens when mode has already been set, and we're
+                 // not at the start of the buffer. Allows multiple :'s in a
+                 // query.
+          // Non-command, non-mode-setter, just add buf to query.
           query[strlen(query)] = buf;
         }
         break;
         
-      default:
+      default: // Just part of query.
         query[strlen(query)] = buf;
         break;
     }
   }
   query[strlen(query)] = '\0';
-  // tokenize query ?
   
   // This is where the actual searching would happen. Perhaps this is where we
   // call song_db.search(query, mode = OTHER) which does.. something. The
   // results will be rather messy.
   
-  if (song_db.search(query, results, mode)) { // this could use a SongDB, which
-                                              // could be nice (?)
+  // Above was implemented successfully!
+  
+  if (song_db.search(query, results, mode)) { // This could use a SongDB, which
+                                              // could be nice (?).
     for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
-      // bail on first bad result
+      // Bail on first bad result.
       if (!results[i].isPopulated) break;
       results[i].print();
     }
@@ -287,7 +295,7 @@ void search(const SongDB& song_db) { // should return something.
 // This would be nice if I could have something similar to more/less, but that
 // would be a lot of work.
 void view(const SongDB& song_db) {
-  // this could also just loop until i >= song_db.items..
+  // This could also just loop until i >= song_db.items..
   for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
     // To save cycles, as soon as Song.print() returns false (meaning the
     // current object's `isPopulated` field is false), break out of the loop and
@@ -328,7 +336,7 @@ void loadFile(SongDB& song_db, const char *delim) {
     song_db.songs[song_db.items].index = song_db.items;
     song_db.items++;
   }
-  // entire file should be loaded into memory now
+  // Entire file should be loaded into memory now.
   
   f.close();
 }

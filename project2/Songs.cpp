@@ -17,11 +17,11 @@ const char* Song::getArtist() const {
   return _artist;
 }
 
-unsigned int Song::getMinutes() {
+unsigned int Song::getMinutes() { // Unnecessary; keeping for consistency.
   return minutes;
 }
 
-unsigned int Song::getSeconds() {
+unsigned int Song::getSeconds() { // Unnecessary; keeping for consistency.
   return seconds;
 }
 
@@ -78,6 +78,8 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
   // stripped, which would mean I would only need to generate that value once,
   // which keeps searching reasonably efficient.
   
+  // The above was implemented with reasonable success.
+  
   // Either way, clearly the searching for the assignment specifications will be
   // rather barebones and not as nice as full-featured as I would like. Alas,
   // there are only so many hours in the day.
@@ -85,11 +87,11 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
   int count = 0;
   char norm_query[MAX_STRING_SIZE] = {};
   char *token;
-  char *cmpmethod; // used for time search query
+  char *cmpmethod; // Used for time search query.
   unsigned int minutes = 0;
   unsigned int seconds = 0;
   strncpy(norm_query, query, strlen(query));
-  if (!(mode == TIME))
+  if (!(mode == TIME)) // Don't normalize for time queries.
     normalize(norm_query);
   
   switch (mode) {
@@ -99,7 +101,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
           results[count++] = songs[i];
         }
       }
-      break;
+      break; // case TITLE
       
     case ARTIST:
       for (int i = 0; i <= items; i++) {
@@ -107,7 +109,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
           results[count++] = songs[i];
         }
       }
-      break;
+      break; // case ARTIST
       
     case ALBUM:
       for (int i = 0; i <= items; i++) {
@@ -115,7 +117,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
           results[count++] = songs[i];
         }
       }
-      break;
+      break; // case ALBUM
       
     case TIME:
       // search for time. this will be fun!
@@ -166,14 +168,20 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                     results[count++] = songs[i];
                   }
             }
-            break;
+            break; // case '<'
             
           case '=': // =
+            if (strlen(cmpmethod) == 2 &&
+                cmpmethod[1] != '=') {
+              std::cerr << "Didn't understand comparison operator: "
+              << cmpmethod << '\n';
+              return false;
+            }
             if (songs[i].minutes == minutes &&
                 songs[i].seconds == seconds) {
               results[count++] = songs[i];
             }
-            break;
+            break; // case '='
             
           case '>':
             if (strlen(cmpmethod) == 2) {
@@ -198,11 +206,10 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
             break;
         }
       }
-      break;
+      break; // case TIME
       
     default:
       for (int i = 0; i <= items; i++) {
-        // if query
         if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
           results[count++] = songs[i];
         } else if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
@@ -211,7 +218,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
           results[count++] = songs[i];
         }
       }
-      break;
+      break; // default
   }
   return count > 0;
 }
@@ -272,6 +279,5 @@ Mode strToMode(const char* mode) {
   if (strncmp("artist", lower, strlen(lower)) == 0) return ARTIST;
   if (strncmp("time", lower, strlen(lower)) == 0) return TIME;
   if (strncmp("album", lower, strlen(lower)) == 0) return ALBUM;
-  return OTHER; // This is necessary for the compiler with how the above series
-  // of returns are structured, but it should never be reached.
+  return OTHER;
 }

@@ -14,16 +14,14 @@
 #include <cstring>
 #include "libian.hpp"
 
-// Move to Parser.
 enum Mode {
   TITLE,
   ARTIST,
   TIME,
   ALBUM,
-  OTHER // This won't be used, but I'm reserving it for now.
+  OTHER
 };
 
-// private is best, but I don't want to deal with that right now.
 class Song {
 private:
 // private, "normalized" values
@@ -31,8 +29,7 @@ private:
   char _artist[MAX_STRING_SIZE];
   char _album[MAX_STRING_SIZE];
   
-  // public "consumable" values.
-  
+// public "consumable" values.
 public: // I don't like having these internal values be public but I don't have
         // time to model it correctly. I need to quit my job.
   size_t index;
@@ -43,13 +40,14 @@ public: // I don't like having these internal values be public but I don't have
   char title[MAX_STRING_SIZE];
   char artist[MAX_STRING_SIZE];
   unsigned int minutes; // Although it's highly unlikely, using an int instead
-  // of a char allows for songs longer than 255 minutes.
+                        // of a char allows for songs longer than 255 minutes.
   unsigned int seconds; // Seconds are forced into a range of 0-59, which means
-  // the smallest type to contain it is an unsigned char.
-  // Unforunately I don't care to figure out why casting to an unsigned char
-  // in some logic for reading in from a file is causing issues, so I'm just
-  // using an unsigned int instead. No system running this program will actually
-  // have very constrained memory usage or disk space.
+                        // the smallest type to contain it is an unsigned char.
+                        // Unforunately I don't care to figure out why casting
+                        // to an unsigned char in some logic for reading in from
+                        // a file is causing issues, so I'm just using an
+                        // unsigned int instead. No system running this program
+                        // will actually have constrained memory usage.
   char album[MAX_STRING_SIZE];
   bool isPopulated;
   Song& setTitle(const char*);
