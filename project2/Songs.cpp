@@ -135,7 +135,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
 }
 
 SongDB::~SongDB() {
-  std::ofstream f("/Users/ian/misc/school/cs162/projects/project2/project2/songs.txt");
+  std::ofstream f("songs.txt");
   for (auto s : songs) {
     // quit on first unpopulated entry.
     if (!s.isPopulated) break;
