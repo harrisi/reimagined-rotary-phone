@@ -191,7 +191,7 @@ void search(const SongDB& song_db) { // should return something (?)
   bool startOf = true;
   bool stop = false;
   bool modeset = false;
-  Song results[100]; // Arbitrary number. Memory allocation is a beach.
+  Song results[MAX_RESULT_SIZE]; // Memory allocation is a beach.
   char query[MAX_STRING_SIZE] = {}; // Holds actual query. This will exclude
                                     // specific "category" to search for.
   
@@ -267,7 +267,7 @@ void search(const SongDB& song_db) { // should return something (?)
   
   if (song_db.search(query, results, mode)) { // This could use a SongDB, which
                                               // could be nice (?).
-    for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
+    for (int i = 0; i < MAX_RESULT_SIZE; i++) {
       // Bail on first bad result.
       if (!results[i].isPopulated) break;
       results[i].print();

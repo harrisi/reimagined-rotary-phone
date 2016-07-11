@@ -29,6 +29,11 @@ const int MAX_STRING_SIZE = 1000;
 // of memory. I really wish I could use strings. This is silly.
 const int MAX_SONG_DB_SIZE = 1000;
 
+// Maximum results that can be returned by a search. This is an arbitrary number
+// and is a giant warning sign that my current memory functionality is abysmal.
+// I don't have time to do anything about it!
+const int MAX_RESULT_SIZE = 100;
+
 void getString(char*);
 int getInt(const int = std::numeric_limits<int>::min(),
            const int = std::numeric_limits<int>::max());

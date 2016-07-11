@@ -97,6 +97,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
   switch (mode) {
     case TITLE:
       for (int i = 0; i <= items; i++) {
+        if (count >= MAX_RESULT_SIZE) break;
         if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
@@ -105,6 +106,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       
     case ARTIST:
       for (int i = 0; i <= items; i++) {
+        if (count >= MAX_RESULT_SIZE) break;
         if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
@@ -113,6 +115,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       
     case ALBUM:
       for (int i = 0; i <= items; i++) {
+        if (count >= MAX_RESULT_SIZE) break;
         if (strstr(songs[i].getAlbum(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
@@ -154,6 +157,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                 if (songs[i].minutes < minutes ||
                     (songs[i].minutes == minutes &&
                      songs[i].seconds <= seconds)) {
+                      if (count >= MAX_RESULT_SIZE) break;
                       results[count++] = songs[i];
                     }
               } else {
@@ -165,6 +169,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
               if (songs[i].minutes < minutes ||
                   (songs[i].minutes == minutes &&
                    songs[i].seconds < seconds)) {
+                    if (count >= MAX_RESULT_SIZE) break;
                     results[count++] = songs[i];
                   }
             }
@@ -179,6 +184,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
             }
             if (songs[i].minutes == minutes &&
                 songs[i].seconds == seconds) {
+              if (count >= MAX_RESULT_SIZE) break;
               results[count++] = songs[i];
             }
             break; // case '='
@@ -189,6 +195,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                 if (songs[i].minutes > minutes ||
                     (songs[i].minutes == minutes &&
                      songs[i].seconds >= seconds)) {
+                      if (count >= MAX_RESULT_SIZE) break;
                       results[count++] = songs[i];
                     }
               } else {
@@ -200,6 +207,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
               if (songs[i].minutes > minutes ||
                   (songs[i].minutes == minutes &&
                    songs[i].seconds > seconds)) {
+                    if (count >= MAX_RESULT_SIZE) break;
                     results[count++] = songs[i];
                   }
             }
@@ -211,6 +219,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                 if (songs[i].minutes != minutes ||
                     (songs[i].minutes == minutes &&
                      songs[i].seconds != seconds)) {
+                      if (count >= MAX_RESULT_SIZE) break;
                       results[count++] = songs[i];
                     }
               } else {
@@ -222,6 +231,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
               if (songs[i].minutes != minutes ||
                   (songs[i].minutes == minutes &&
                    songs[i].seconds != seconds)) {
+                    if (count >= MAX_RESULT_SIZE) break;
                     results[count++] = songs[i];
                   }
             }
@@ -233,15 +243,20 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
     default:
       for (int i = 0; i <= items; i++) {
         if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
+          if (count >= MAX_RESULT_SIZE) break;
           results[count++] = songs[i];
         } else if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
+          if (count >= MAX_RESULT_SIZE) break;
           results[count++] = songs[i];
         } else if (strstr(songs[i].getAlbum(), norm_query) != nullptr) {
+          if (count >= MAX_RESULT_SIZE) break;
           results[count++] = songs[i];
         }
       }
       break; // default
   }
+  if (++count >= MAX_RESULT_SIZE)
+    std::cerr << "Max search results (" << MAX_RESULT_SIZE << ") returned!\n";
   return count > 0;
 }
 
