@@ -18,13 +18,21 @@
 //}
 
 char* MusicVal::operator()() const {
-  return nullptr;
+  return (char*)value;
 }
 
 void MusicVal::operator()(const char *val) {
   strncpy(value, val, MAX_STRING_SIZE);
   strncpy(_value, val, MAX_STRING_SIZE);
   normalize(_value);
+}
+
+unsigned int Time::operator()() const {
+  return value;
+}
+
+void Time::operator()(const unsigned int val) {
+  value = val;
 }
 
 bool Song::isPopulated() const {
@@ -127,12 +135,4 @@ Mode strToMode(const char* mode) {
   if (strncmp("album", lower, strlen(lower)) == 0) return ALBUM;
   return OTHER; // This is necessary for the compiler with how the above series
   // of returns are structured, but it will never be reached.
-}
-
-unsigned int Time::operator()() const {
-  return value;
-}
-
-void Time::operator()(const unsigned int val) {
-  value = val;
 }

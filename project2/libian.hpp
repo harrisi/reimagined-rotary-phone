@@ -21,7 +21,7 @@ const int MAX_STRING_SIZE = 1000;
 
 // Maximum amount of songs possible. I might try increasing this to 50k to mimic
 // Google Play Music's capacity.
-const int MAX_SONG_DB_SIZE = 2000;
+const int MAX_SONG_DB_SIZE = 1000;
 
 void getString(char*);
 int getInt(const int = std::numeric_limits<int>::lowest(),

@@ -17,7 +17,7 @@ void loadFile(SongDB&, const char = ';');
 int main() {
   char input;
   std::cout << "Welcome to Ian's music library program!\n";
-  SongDB songs{};
+  SongDB songs;
   loadFile(songs);
   while ((input = doMenu()) != 'q') {
     switch (tolower(input)) {
