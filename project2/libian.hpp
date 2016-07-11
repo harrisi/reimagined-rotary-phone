@@ -33,5 +33,6 @@ int getInt(const int = std::numeric_limits<int>::min(),
            const int = std::numeric_limits<int>::max());
 
 void normalize(char*);
+bool isInt(const char*);
 
 #endif /* libian_hpp */

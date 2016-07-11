@@ -18,11 +18,11 @@ const char* Song::getArtist() const {
 }
 
 const unsigned int Song::getMinutes() {
-  return _minutes;
+  return minutes;
 }
 
 const unsigned int Song::getSeconds() {
-  return _seconds;
+  return seconds;
 }
 
 const char* Song::getAlbum() const {
@@ -120,11 +120,29 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
     case TIME:
       // search for time. this will be fun!
       token = strtok(norm_query, " ");
+      if (token == nullptr) {
+        std::cerr << "Error reading query: '"
+        << norm_query
+        << "'! Stopping search.\n";
+        return false;
+      }
       cmpmethod = token;
       // using a tokenizer, get each actual piece of information.
       token = strtok(nullptr, ":");
+      if (token == nullptr) {
+        std::cerr << "Error reading query: '"
+        << norm_query
+        << "'! Stopping search.\n";
+        return false;
+      }
       minutes = atoi(token);
       token = strtok(nullptr, "\0");
+      if (token == nullptr) {
+        std::cerr << "Error reading query: '"
+        << norm_query
+        << "'! Stopping search.\n";
+        return false;
+      }
       seconds = atoi(token);
       for (int i = 0; i <= items; i++) {
         switch (cmpmethod[0]) {
@@ -139,6 +157,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
               } else {
                 std::cerr << "Didn't understand comparison operator: "
                 << cmpmethod << '\n';
+                return false;
               }
             } else { // <
               if (songs[i].minutes < minutes ||
@@ -167,6 +186,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
               } else {
                 std::cerr << "Didn't understand comparison operator: "
                 << cmpmethod << '\n';
+                return false;
               }
             } else { // >
               if (songs[i].minutes > minutes ||
@@ -229,13 +249,11 @@ Song& Song::setArtist(const char *val) {
 
 Song& Song::setMinutes(const unsigned int val) {
   minutes = val;
-  _minutes = val;
   return *this;
 }
 
 Song& Song::setSeconds(const unsigned int val) {
   seconds = val;
-  _seconds = val;
   return *this;
 }
 

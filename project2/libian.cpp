@@ -42,3 +42,12 @@ void normalize(char *val) {
   }
   *i = '\0';
 }
+
+bool isInt(const char* val) {
+  while (*val) {
+    if(!isnumber(*val++)) {
+      return false;
+    }
+  }
+  return true;
+}

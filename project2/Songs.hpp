@@ -29,8 +29,6 @@ private:
 // private, "normalized" values
   char _title[MAX_STRING_SIZE];
   char _artist[MAX_STRING_SIZE];
-  unsigned int _minutes;
-  unsigned int _seconds;
   char _album[MAX_STRING_SIZE];
   
   // public "consumable" values.

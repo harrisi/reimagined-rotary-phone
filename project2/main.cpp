@@ -13,7 +13,7 @@ void search(const SongDB&);
 void view(const SongDB&);
 
 // May want to move elsewhere and abstract away some of the details.
-void loadFile(SongDB&, const char = ';');
+void loadFile(SongDB&, const char* = ";");
 
 int main() {
   char input;
@@ -74,6 +74,8 @@ char doMenu() {
 
 void add(SongDB& song_db) {
   char buf[MAX_STRING_SIZE];
+  char *minutes = nullptr;
+  char *seconds = nullptr;
   
   // I think I'll be able to abstract away the reading of information from
   // loadFile to some function ("songFromStream" or the like) which reads in a
@@ -93,21 +95,29 @@ void add(SongDB& song_db) {
   // (i.e., 0 <= seconds < 60). Oh well. This is at least cool.
   std::cout << "Song duration (e.g. '4:20'): ";
   getString(buf);
-  char *token = strtok(buf, ":");
-  song_db.songs[song_db.items].setMinutes(atoi(token));
-  token = strtok(nullptr, "\n");
-  song_db.songs[song_db.items].setSeconds(atoi(token));
+  minutes = strtok(buf, ":");
+  if (minutes != nullptr)
+    seconds = strtok(nullptr, "\n");
+  while (minutes == nullptr ||
+         seconds == nullptr ||
+         !isInt(minutes) ||
+         !isInt(seconds) ||
+         atoi(seconds) < 0 ||
+         atoi(seconds) > 59) {
+    std::cout << "Invalid input! Try again: ";
+    getString(buf);
+    minutes = strtok(buf, ":");
+    if (minutes != nullptr)
+      seconds = strtok(nullptr, "\n");
+    
+  }
   
-//  std::cout << "Song minutes: ";
-//  song_db.songs[song_db.items].setMinutes(getInt(0));
-//  
-//  std::cout << "Song seconds: ";
-//  song_db.songs[song_db.items].setSeconds(getInt(0, 59));
+  song_db.songs[song_db.items].setMinutes(atoi(minutes));
+  song_db.songs[song_db.items].setSeconds(atoi(seconds));
   
   std::cout << "Song album: ";
   getString(buf);
   song_db.songs[song_db.items].setAlbum(buf);
-  //std::strncpy(song_db.songs[song_db.items].album, buf, MAX_STRING_SIZE);
   
   song_db.songs[song_db.items].isPopulated = true;
   song_db.songs[song_db.items].index = song_db.items;
@@ -289,7 +299,7 @@ void view(const SongDB& song_db) {
   }
 }
 
-void loadFile(SongDB& song_db, const char delim) {
+void loadFile(SongDB& song_db, const char *delim) {
   char in[MAX_STRING_SIZE];
   std::ifstream f("songs.txt");
   char *token;
@@ -304,18 +314,19 @@ void loadFile(SongDB& song_db, const char delim) {
   while (f.getline(in, std::numeric_limits<std::streamsize>::max()) &&
          song_db.items <= MAX_SONG_DB_SIZE) {
     if (f.eof()) break;
-    token = strtok(in, ";");
+    token = strtok(in, delim);
     song_db.songs[song_db.items].setTitle(token);
-    token = strtok(nullptr, ";");
+    token = strtok(nullptr, delim);
     song_db.songs[song_db.items].setArtist(token);
-    token = strtok(nullptr, ";");
+    token = strtok(nullptr, delim);
     song_db.songs[song_db.items].setMinutes(atoi(token));
-    token = strtok(nullptr, ";");
+    token = strtok(nullptr, delim);
     song_db.songs[song_db.items].setSeconds(atoi(token));
-    token = strtok(nullptr, ";");
+    token = strtok(nullptr, delim);
     song_db.songs[song_db.items].setAlbum(token);
     song_db.songs[song_db.items].isPopulated = true;
-    song_db.songs[song_db.items].index = ++song_db.items;
+    song_db.songs[song_db.items].index = song_db.items;
+    song_db.items++;
   }
   // entire file should be loaded into memory now
   
