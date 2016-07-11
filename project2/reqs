@@ -12,7 +12,7 @@ load song information from data file when app started
 [x] view
 [x] add
 [x] remove
-[ ] search
+[x] search
 for songs
 
 [x] save data to same file when program exits
@@ -25,9 +25,9 @@ for songs
 
 [x] remove song by index
 
-[ ] search for songs by a certain artist
+[x] search for songs by a certain artist
 
-[ ] search for songs by a certain album
+[x] search for songs by a certain album
 
 [x] quit
 
@@ -49,7 +49,7 @@ title;artist;minute;second;album
 
 ================ EXTRAS ================
 
-[ ] search by song name
+[x] search by song name
 
 [ ] search by time
 
