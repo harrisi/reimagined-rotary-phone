@@ -16,11 +16,11 @@ const char* Song::getArtist() const {
   return _artist;
 }
 
-const unsigned int Song::getMinutes() const {
+const unsigned int Song::getMinutes() {
   return _minutes;
 }
 
-const unsigned int Song::getSeconds() const {
+const unsigned int Song::getSeconds() {
   return _seconds;
 }
 
@@ -47,6 +47,8 @@ void Song::print() const {
 
 bool SongDB::print(const int index) const {
   if (!songs[index].isPopulated) return false;
+  // Due to some restructuring, this isn't really needed, but I don't really
+  // care to restructure the code. This has some nice features about it anyway.
   songs[index].print();
   return true;
 }
@@ -101,11 +103,6 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       }
       break;
       
-    case TIME:
-      // search for time. this will be fun!
-      std::cout << "Not yet implemented!\n";
-      break;
-      
     case ALBUM:
       for (int i = 0; i <= items; i++) {
         // if query
@@ -114,6 +111,12 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
         }
       }
       break;
+      
+    case TIME:
+      // search for time. this will be fun!
+      std::cout << "Time searching not yet implemented!\n"
+      << "Using default search.\n";
+      //break;
       
     default:
       for (int i = 0; i <= items; i++) {
@@ -132,7 +135,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
 }
 
 SongDB::~SongDB() {
-  std::ofstream f("songs.txt");
+  std::ofstream f("/Users/ian/misc/school/cs162/projects/project2/project2/songs.txt");
   for (auto s : songs) {
     // quit on first unpopulated entry.
     if (!s.isPopulated) break;

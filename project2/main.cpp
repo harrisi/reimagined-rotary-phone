@@ -89,11 +89,20 @@ void add(SongDB& song_db) {
   song_db.songs[song_db.items].setArtist(buf);
   //std::strncpy(song_db.songs[song_db.items].artist, buf, MAX_STRING_SIZE);
   
-  std::cout << "Song minutes: ";
-  song_db.songs[song_db.items].setMinutes(getInt(0));
+  // Neat. But it doesn't actually have any code for maintaining useful times
+  // (i.e., 0 <= seconds < 60). Oh well. This is at least cool.
+  std::cout << "Song duration (e.g. '4:20'): ";
+  getString(buf);
+  char *token = strtok(buf, ":");
+  song_db.songs[song_db.items].setMinutes(atoi(token));
+  token = strtok(nullptr, "\n");
+  song_db.songs[song_db.items].setSeconds(atoi(token));
   
-  std::cout << "Song seconds: ";
-  song_db.songs[song_db.items].setSeconds(getInt(0, 59));
+//  std::cout << "Song minutes: ";
+//  song_db.songs[song_db.items].setMinutes(getInt(0));
+//  
+//  std::cout << "Song seconds: ";
+//  song_db.songs[song_db.items].setSeconds(getInt(0, 59));
   
   std::cout << "Song album: ";
   getString(buf);
@@ -149,8 +158,10 @@ void doCommand(const char command) {
       << "\ttime (not currently implemented)\n"
       << "\talbum\n"
       << "Using one of these fields as the start of the query allows for more\n"
-      << "specific search functionality. If the field selector is omitted, the\n"
-      << "default behavior is to search for every field for each item. This is\n"
+      <<
+      "specific search functionality. If the field selector is omitted, the\n"
+      <<
+      "default behavior is to search for every field for each item. This is\n"
       << "slower, but is still useful.\n";
       break;
       
@@ -232,8 +243,8 @@ void search(const SongDB& song_db) { // should return something.
   // call song_db.search(query, mode = OTHER) which does.. something. The
   // results will be rather messy.
   
-  if (song_db.search(query, results, mode)) { // this could use a SongDB, which could
-                                        // be nice (?)
+  if (song_db.search(query, results, mode)) { // this could use a SongDB, which
+                                              // could be nice (?)
     for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
       // bail on first bad result
       if (!results[i].isPopulated) break;
@@ -311,36 +322,36 @@ void loadFile(SongDB& song_db, const char delim) {
     switch (fsm) {
       case TITLE:
         song_db.songs[song_db.items].setTitle(in);
-        //std::strncpy(song_db.songs[song_db.items].title, in, MAX_STRING_SIZE);
         fsm = ARTIST;
         break;
         
       case ARTIST:
         song_db.songs[song_db.items].setArtist(in);
-        //std::strncpy(song_db.songs[song_db.items].artist, in, MAX_STRING_SIZE);
         fsm = MINUTES;
         break;
         
       case MINUTES:
-        song_db.songs[song_db.items].setMinutes(static_cast<unsigned int>(atoi(in)));
+        song_db.songs[song_db.items]
+        .setMinutes(static_cast<unsigned int>(atoi(in)));
         fsm = SECONDS;
         break;
         
       case SECONDS:
-        song_db.songs[song_db.items].setSeconds(static_cast<unsigned int>(atoi(in)));
+        song_db.songs[song_db.items]
+        .setSeconds(static_cast<unsigned int>(atoi(in)));
         fsm = ALBUM;
         break;
         
       case ALBUM:
         song_db.songs[song_db.items].setAlbum(in);
-        //std::strncpy(song_db.songs[song_db.items].album, in, MAX_STRING_SIZE);
         fsm = TITLE;
         song_db.songs[song_db.items].isPopulated = true;
         song_db.songs[song_db.items].index = song_db.items;
         // XXX: I hate this.
         if (f.peek() == '\n') { // using peek and panicking is reasonable.
           f.get(); // consume newline.
-          song_db.items++; // this is the actual tracking of the index which seems silly.
+          song_db.items++; // this is the actual tracking of the index which
+                           // seems silly.
         } else {
           if (f.peek() == EOF) { // this catches the case where the file doesn't
                                  // contain a newline before EOF.
@@ -361,6 +372,5 @@ void loadFile(SongDB& song_db, const char delim) {
   }
   // entire file should be loaded into memory now
   
-  // close file
   f.close();
 }

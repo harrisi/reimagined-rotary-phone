@@ -61,8 +61,8 @@ public: // I don't like having these internal values be public but I don't have
   Song& setAlbum(const char*);
   const char* getTitle() const;
   const char* getArtist() const;
-  const unsigned int getMinutes() const;
-  const unsigned int getSeconds() const;
+  const unsigned int getMinutes();
+  const unsigned int getSeconds();
   const char* getAlbum() const;
   void print() const;
 };
