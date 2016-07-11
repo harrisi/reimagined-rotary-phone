@@ -5,9 +5,9 @@ SRC=$(wildcard *.cpp)
 OBJ=$(SRC:.cpp=.o)
 
 rrp: $(OBJ)
-  g++ -o $@ $^
+	g++ -o $@ $^
 
 .PHONY: clean
 
 clean:
-  rm $(OBJ)
+	rm $(OBJ)
