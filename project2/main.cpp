@@ -101,6 +101,7 @@ void add(SongDB& song_db) {
   //std::strncpy(song_db.songs[song_db.items].album, buf, MAX_STRING_SIZE);
   
   song_db.songs[song_db.items].isPopulated = true;
+  song_db.songs[song_db.items].index = song_db.items;
   
   // Make sure we maintain index correctness.
   song_db.items++;
@@ -114,9 +115,11 @@ void remove(SongDB& song_db) {
   int input;
   std::cout
   << "Which song would you like to remove? (Numeric index, i.e., 42): ";
-  while ((input = getInt()) < 0 || input > song_db.items) {
+  while ((input = getInt()) < 0 || input >= song_db.items) {
     std::cout << "Index out of range! Try again: ";
-  }
+  } // I don't like this because it forces the user to delete an item. If they
+    // accidentally get here, they are forced to delete something or force exit
+    // the program.
   // could check if equal here for some extra cool maybe efficiency!
   while (++input < song_db.items) {
     // As a consequence of the changes, I can now chain these methods for some
@@ -126,6 +129,7 @@ void remove(SongDB& song_db) {
       .setMinutes(song_db.songs[input].minutes)
       .setSeconds(song_db.songs[input].seconds)
       .setAlbum(song_db.songs[input].album);
+    song_db.songs[input].index--;
   }
   song_db.songs[--song_db.items].isPopulated = false;
   //song_db.items--;
@@ -170,10 +174,21 @@ void search(const SongDB& song_db) { // should return something.
   char lookahead = -1;
   bool startOf = true;
   bool stop = false;
-  char query[MAX_STRING_SIZE] = {}; // holds actual query. This will exclude
-                                   // specific "category" to search for.
-  // Decide how to search (assignment requires artist and album)
-  //std::cout << "Search for artist or album? ";
+  Song results[100]; // Arbitrary number. Memory allocation is a beach.
+  char query[MAX_STRING_SIZE] = {}; // Holds actual query. This will exclude
+                                    // specific "category" to search for.
+  
+  // For some reason if I don't do this, the results are "cached," but I'm not
+  // sure why. This is also favorable to `Song results[n] = {};`, because this
+  // approach, for some reason, uses a crazy amount of memory. Memory
+  // allocation is a real issue with my current approach.
+  for (int i = 0; ; i++) {
+    if (results[i].isPopulated) {
+      results[i].isPopulated = false;
+    } else {
+      break;
+    }
+  }
   
   // By default, search all fields (artist, album, title). This would require
   // an exact match, which I don't like. At the very least I will probably
@@ -194,8 +209,7 @@ void search(const SongDB& song_db) { // should return something.
       startOf = false;
     } else { // should only happen on first loop.
       if ((buf = getchar()) == EOF || buf == '\n') break;
-      if ((lookahead = getchar()) == EOF || lookahead == '\n') stop = true;
-      //startOf = true; // this is in the wrong place.
+      stop = (lookahead = getchar()) == EOF || lookahead == '\n';
     }
     switch (buf) {
       case ':':
@@ -220,8 +234,16 @@ void search(const SongDB& song_db) { // should return something.
   // call song_db.search(query, mode = OTHER) which does.. something. The
   // results will be rather messy.
   
+  if (song_db.search(query, results, mode)) { // this could use a SongDB, which could
+                                        // be nice (?)
+    for (int i = 0; i < MAX_SONG_DB_SIZE; i++) {
+      // bail on first bad result
+      if (!results[i].isPopulated) break;
+      results[i].print();
+    }
+  }
   
-  
+#if IANDEBUG
   std::cout << "mode: ";
   switch (mode) {
     case TITLE: std::cout << "title\n";
@@ -236,6 +258,7 @@ void search(const SongDB& song_db) { // should return something.
       break;
   }
   std::cout << "query: " << query << '\n';
+#endif
 }
 
 // This would be nice if I could have something similar to more/less, but that
@@ -315,6 +338,7 @@ void loadFile(SongDB& song_db, const char delim) {
         //std::strncpy(song_db.songs[song_db.items].album, in, MAX_STRING_SIZE);
         fsm = TITLE;
         song_db.songs[song_db.items].isPopulated = true;
+        song_db.songs[song_db.items].index = song_db.items;
         // XXX: I hate this.
         if (f.peek() == '\n') { // using peek and panicking is reasonable.
           f.get(); // consume newline.

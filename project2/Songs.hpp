@@ -37,7 +37,7 @@ private:
   
 public: // I don't like having these internal values be public but I don't have
         // time to model it correctly. I need to quit my job.
-  
+  size_t index;
   // I could model this object better and define a destructor that would do all
   // the cleanup for me for free. This would probably be my favorite approach,
   // but it would require remodelling the whole program flow, most likely. For
@@ -59,13 +59,12 @@ public: // I don't like having these internal values be public but I don't have
   Song& setMinutes(const unsigned int);
   Song& setSeconds(const unsigned int);
   Song& setAlbum(const char*);
-#ifdef IANDEBUG
   const char* getTitle() const;
   const char* getArtist() const;
   const unsigned int getMinutes() const;
   const unsigned int getSeconds() const;
   const char* getAlbum() const;
-#endif
+  void print() const;
 };
 
 struct SongDB {

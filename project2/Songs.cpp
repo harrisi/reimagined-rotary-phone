@@ -8,7 +8,6 @@
 
 #include "Songs.hpp"
 
-#ifdef IANDEBUG
 const char* Song::getTitle() const {
   return _title;
 }
@@ -28,23 +27,27 @@ const unsigned int Song::getSeconds() const {
 const char* Song::getAlbum() const {
   return _album;
 }
-#endif
 
-bool SongDB::print(const int index) const {
-  if (!songs[index].isPopulated) return false;
+void Song::print() const {
+  if (!isPopulated) return;
   std::cout
   << "Index: " << index << '\n'
 #ifdef IANDEBUG
   << "normalized:\n"
-  << "\tTitle: " << songs[index].getTitle() << '\n'
-  << "\tArtist: " << songs[index].getArtist() << '\n'
-  << "\tDuration: " << songs[index].getMinutes() << ':' << songs[index].getSeconds() << '\n'
-  << "\tAlbum: " << songs[index].getAlbum() << '\n'
+  << "\tTitle: " << getTitle() << '\n'
+  << "\tArtist: " << getArtist() << '\n'
+  << "\tDuration: " << getMinutes() << ':' << getSeconds() << '\n'
+  << "\tAlbum: " << getAlbum() << '\n'
 #endif
-  << "Title: " << songs[index].title << '\n'
-  << "Arist: " << songs[index].artist << '\n'
-  << "Duration: " << songs[index].minutes << ':' << songs[index].seconds << '\n'
-  << "Album: " << songs[index].album << "\n\n";
+  << "Title: " << title << '\n'
+  << "Arist: " << artist << '\n'
+  << "Duration: " << minutes << ':' << seconds << '\n'
+  << "Album: " << album << "\n\n";
+}
+
+bool SongDB::print(const int index) const {
+  if (!songs[index].isPopulated) return false;
+  songs[index].print();
   return true;
 }
 
@@ -73,28 +76,59 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
   // Either way, clearly the searching for the assignment specifications will be
   // rather barebones and not as nice as full-featured as I would like. Alas,
   // there are only so many hours in the day.
+  
+  int count = 0;
+  char norm_query[MAX_STRING_SIZE] = {};
+  strncpy(norm_query, query, strlen(query));
+  normalize(norm_query);
+  
   switch (mode) {
     case TITLE:
-      // search for title
+      for (int i = 0; i <= items; i++) {
+        // if query
+        if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
+          results[count++] = songs[i];
+        }
+      }
       break;
       
     case ARTIST:
-      // search for artist
+      for (int i = 0; i <= items; i++) {
+        // if query
+        if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
+          results[count++] = songs[i];
+        }
+      }
       break;
       
     case TIME:
       // search for time. this will be fun!
+      std::cout << "Not yet implemented!\n";
       break;
       
     case ALBUM:
-      // search for album
+      for (int i = 0; i <= items; i++) {
+        // if query
+        if (strstr(songs[i].getAlbum(), norm_query) != nullptr) {
+          results[count++] = songs[i];
+        }
+      }
       break;
       
     default:
-      // search for everything
+      for (int i = 0; i <= items; i++) {
+        // if query
+        if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
+          results[count++] = songs[i];
+        } else if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
+          results[count++] = songs[i];
+        } else if (strstr(songs[i].getAlbum(), norm_query) != nullptr) {
+          results[count++] = songs[i];
+        }
+      }
       break;
   }
-  return false;
+  return count > 0;
 }
 
 SongDB::~SongDB() {
@@ -147,14 +181,13 @@ Song& Song::setAlbum(const char *val) {
 }
 
 Mode strToMode(const char* mode) {
-  char lower[10];
-  for (size_t i = 0; i < strlen(mode); i++) {
-    lower[i] = tolower(mode[i]);
-  }
+  char lower[MAX_STRING_SIZE];
+  strncpy(lower, mode, MAX_STRING_SIZE);
+  normalize(lower);
   if (strncmp("title", lower, strlen(lower)) == 0) return TITLE;
   if (strncmp("artist", lower, strlen(lower)) == 0) return ARTIST;
   if (strncmp("time", lower, strlen(lower)) == 0) return TIME;
   if (strncmp("album", lower, strlen(lower)) == 0) return ALBUM;
   return OTHER; // This is necessary for the compiler with how the above series
-  // of returns are structured, but it will never be reached.
+  // of returns are structured, but it should never be reached.
 }
