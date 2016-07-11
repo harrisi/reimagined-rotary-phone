@@ -6,6 +6,7 @@
 //  Copyright © 2016 Ian Harris. All rights reserved.
 //
 
+#include <iomanip>
 #include "Songs.hpp"
 
 const char* Song::getTitle() const {
@@ -41,7 +42,9 @@ void Song::print() const {
 #endif
   << "Title: " << title << '\n'
   << "Arist: " << artist << '\n'
-  << "Duration: " << minutes << ':' << seconds << '\n'
+  << "Duration: " << minutes << ':'
+  << std::setfill('0') << std::setw(2)
+  << seconds << '\n'
   << "Album: " << album << "\n\n";
 }
 
@@ -142,6 +145,7 @@ SongDB::~SongDB() {
     f << s.title << ';'
     << s.artist << ';'
     << s.minutes << ';'
+    << std::setfill('0') << std::setw(2)
     << s.seconds << ';'
     << s.album << '\n';
   }
