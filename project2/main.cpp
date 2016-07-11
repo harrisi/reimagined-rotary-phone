@@ -150,6 +150,8 @@ void remove(SongDB& song_db) {
 }
 
 void doCommand(const char command) {
+  char buf[MAX_STRING_SIZE];
+  
   // This could also include manual functionality options such as reading in
   // from the song DB, saving to the song DB, etc., as well as general
   // ":help add" sort of syntax that would give more specific details for each
@@ -157,19 +159,108 @@ void doCommand(const char command) {
   switch (command) {
     case '?':
       std::cout << "This is the help message for searching.\n"
-      << "Searching is currently not fully implemented, but the basic\n"
-      << "structure of a search is [field]: query\n"
-      << "where field is an optional field selector of:\n"
+      << "Searching follows the basic format of:\n"
+      << "\t[FIELD]: QUERY\n"
+      << "Where field is an optional field selector of:\n"
       << "\ttitle\n"
       << "\tartist\n"
       << "\ttime\n"
       << "\talbum\n"
+      << "And QUERY is the search query.\n"
       << "Using one of these fields as the start of the query allows for more\n"
       <<
       "specific search functionality. If the field selector is omitted, the\n"
       <<
       "default behavior is to search for every field for each item. This is\n"
-      << "slower, but is still useful.\n";
+      << "slower, but is still useful.\n"
+      << "For specific help with a FIELD, try :help FIELD\n";
+      break;
+      
+    case 'h':
+      while (!isspace(getchar()))
+        ; // consume optional "elp"
+      getString(buf);
+      normalize(buf);
+      if (strstr(buf, "title") != nullptr) {
+        std::cout << "Title help text.\n"
+        << "Search for title by prefixing the query with 'title:'. This will\n"
+        << "limit the search results to only those whose title contains the\n"
+        << "query.\n"
+        << "\nEXAMPLE:\n"
+        << "\tSelection> s\n"
+        << "\tEnter search query (or \":?\" for help): title: us and them\n"
+        << "\tIndex: 42\n"
+        << "\tTitle: Us and Them\n"
+        << "\tArist: Pink Floyd\n"
+        << "\tDuration: 7:49\n"
+        << "\tAlbum: The Dark Side of the Moon\n"
+        << "\nNOTES:\n"
+        << "\tCapitalization and spaces are ignored.\n";
+      } else if (strstr(buf, "artist") != nullptr) {
+        std::cout << "Artist help text.\n"
+        <<
+        "Search for artist by prefixing the query with 'artist:'. This will\n"
+        << "limit the search results to only those whose artist contains the\n"
+        << "query.\n"
+        << "\nEXAMPLE:\n"
+        << "\tSelection> s\n"
+        << "\tEnter search query (or \":?\" for help): artist: pink floyd\n"
+        << "\tIndex: 42\n"
+        << "\tTitle: Us and Them\n"
+        << "\tArist: Pink Floyd\n"
+        << "\tDuration: 7:49\n"
+        << "\tAlbum: The Dark Side of the Moon\n"
+        << "\nNOTES:\n"
+        << "\tCapitalization and spaces are ignored.\n";
+      } else if (strstr(buf, "time") != nullptr) {
+        std::cout << "Time help text.\n"
+        << "Search by time by prefixing the query with 'time:'. This will\n"
+        << "limit the search results to only those satisfying the predicate\n"
+        << "passed as the query.\n"
+        << "\nEXAMPLE:\n"
+        << "\tSelection> s\n"
+        << "\tEnter search query (or \":?\" for help): time: > 7:00\n"
+        << "\tIndex: 42\n"
+        << "\tTitle: Us and Them\n"
+        << "\tArist: Pink Floyd\n"
+        << "\tDuration: 7:49\n"
+        << "\tAlbum: The Dark Side of the Moon\n"
+        << "\nNOTES:\n"
+        << "\tThe format of this is a bit picky. Whitespace _does_ matter,\n"
+        << "\tto an extent. Try to separate the comparison operator from the\n"
+        << "\ttime being used, i.e., `time: <= 3:30` and not `time: <=3:30`.\n"
+        << "\tThe valid comparison operators are:\n"
+        << "\t\t<\t(song time is LESS THAN given time)\n"
+        << "\t\t<=\t(song time is LESS THAN OR EQUAL TO given time)\n"
+        << "\t\t>\t(song time is GREATER THAN given time)\n"
+        << "\t\t>=\t(song time is GREATER THAN OR EQUAL TO given time)\n"
+        << "\t\t=\t(song time is EQUAL TO given time)\n"
+        << "\t\t==\t(song time is EQUAL TO given time)\n"
+        << "\t\t!\t(song time is NOT EQUAL TO given time)\n"
+        << "\t\t!=\t(song time is NOT EQUAL TO given time)\n";
+      } else if (strstr(buf, "album") != nullptr) {
+        std::cout << "Album help text.\n"
+        << "Search for album by prefixing the query with 'album:'. This will\n"
+        << "limit the search results to only those whose album contains the\n"
+        << "query.\n"
+        << "\nEXAMPLE:\n"
+        << "\tSelection> s\n"
+        << "\tEnter search query (or \":?\" for help): album: dark side\n"
+        << "\tIndex: 42\n"
+        << "\tTitle: Us and Them\n"
+        << "\tArist: Pink Floyd\n"
+        << "\tDuration: 7:49\n"
+        << "\tAlbum: The Dark Side of the Moon\n"
+        << "\nNOTES:\n"
+        << "\tCapitalization and spaces are ignored.\n";
+      } else {
+        std::cout << "General help text.\n"
+        << "Use :help <option> where <option> is one of the following:\n"
+        << "\ttitle\n"
+        << "\tartist\n"
+        << "\ttime\n"
+        << "\talbum\n";
+      }
       break;
       
     default:
@@ -236,6 +327,7 @@ void search(const SongDB& song_db) { // should return something (?)
         if (startOf) { // If ':' is the first character, it's a command. Use
                        // lookahead as the command.
           doCommand(lookahead);
+          return;
           // This feels very weird, but the purpose of this is so that the user
           // can use ':' after the mode. Time searching was giving me problems.
           // In short, this allows for "time: > 4:20" without clobbering "time"

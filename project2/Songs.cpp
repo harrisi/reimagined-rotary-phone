@@ -122,6 +122,8 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       }
       break; // case ALBUM
       
+    // I would also like to allow for "time: 4:20" as a shortcut to
+    // "time: = 4:20".
     case TIME:
       // search for time. this will be fun!
       token = strtok(norm_query, " ");
@@ -312,9 +314,10 @@ Mode strToMode(const char* mode) {
   char lower[MAX_STRING_SIZE];
   strncpy(lower, mode, MAX_STRING_SIZE);
   normalize(lower);
-  if (strncmp("title", lower, strlen(lower)) == 0) return TITLE;
-  if (strncmp("artist", lower, strlen(lower)) == 0) return ARTIST;
-  if (strncmp("time", lower, strlen(lower)) == 0) return TIME;
-  if (strncmp("album", lower, strlen(lower)) == 0) return ALBUM;
+  if (strncmp("title", lower, strlen("title")) == 0) return TITLE;
+  if (strncmp("artist", lower, strlen("artist")) == 0) return ARTIST;
+  if (strncmp("time", lower, strlen("time")) == 0) return TIME;
+  if (strncmp("album", lower, strlen("album")) == 0) return ALBUM;
+  std::cerr << "Mode could not be read!\n";
   return OTHER;
 }
