@@ -45,7 +45,7 @@ void normalize(char *val) {
 
 bool isInt(const char* val) {
   while (*val) {
-    if(!isnumber(*val++)) {
+    if(!isdigit(*val++)) {
       return false;
     }
   }

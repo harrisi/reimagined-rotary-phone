@@ -17,11 +17,11 @@ const char* Song::getArtist() const {
   return _artist;
 }
 
-const unsigned int Song::getMinutes() {
+unsigned int Song::getMinutes() {
   return minutes;
 }
 
-const unsigned int Song::getSeconds() {
+unsigned int Song::getSeconds() {
   return seconds;
 }
 
