@@ -1,6 +1,12 @@
 # reimagined-rotary-phone
 Simple music library manager for Computer Science II project.
 
+# Building
+```
+make
+./rrp # short for reimagined-rotary-phone
+```
+
 # Pre-requisite
 The song "database" is read from a file `songs.txt` in the directory the
 executable is run in. The format of the file is:
