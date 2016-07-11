@@ -286,18 +286,9 @@ void view(const SongDB& song_db) {
 }
 
 void loadFile(SongDB& song_db, const char delim) {
-  enum Items {
-    TITLE,
-    ARTIST,
-    MINUTES,
-    SECONDS,
-    ALBUM
-  } fsm = TITLE;
   char in[MAX_STRING_SIZE];
   std::ifstream f("songs.txt");
-  //Items fsm = TITLE;
-  //int i = 0; // this overwrites from the beginning every time.
-  //f.open;
+  char *token;
   
   if (!f.is_open()) {
     std::cerr << "Failed to load file.\n";
@@ -305,70 +296,22 @@ void loadFile(SongDB& song_db, const char delim) {
     exit(1);
   }
   
-  // get until delim
-  // This needs to check for the case of a newline. How to do this will be
-  // potentially tricky.
-  while (f.get(in, MAX_STRING_SIZE, delim) ||
+  // Rewrite. Much nicer, although a bit flimsy.
+  while (f.getline(in, std::numeric_limits<std::streamsize>::max()) &&
          song_db.items <= MAX_SONG_DB_SIZE) {
-    if (f.eof()) break; // got to EOF, break.
-    if(f.peek() == delim) {
-      f.get(); // consume delimiter
-    } else { // next char isn't delim, panic (this shouldn't happen)
-      std::cerr << "Error reading in data from file; invalid format!\n";
-      exit(1); // XXX: Define error numbering properly.
-    }
-    // assign tokens to values by column
-    // title;artist;mm;ss;album
-    switch (fsm) {
-      case TITLE:
-        song_db.songs[song_db.items].setTitle(in);
-        fsm = ARTIST;
-        break;
-        
-      case ARTIST:
-        song_db.songs[song_db.items].setArtist(in);
-        fsm = MINUTES;
-        break;
-        
-      case MINUTES:
-        song_db.songs[song_db.items]
-        .setMinutes(static_cast<unsigned int>(atoi(in)));
-        fsm = SECONDS;
-        break;
-        
-      case SECONDS:
-        song_db.songs[song_db.items]
-        .setSeconds(static_cast<unsigned int>(atoi(in)));
-        fsm = ALBUM;
-        break;
-        
-      case ALBUM:
-        song_db.songs[song_db.items].setAlbum(in);
-        fsm = TITLE;
-        song_db.songs[song_db.items].isPopulated = true;
-        song_db.songs[song_db.items].index = song_db.items;
-        // XXX: I hate this.
-        if (f.peek() == '\n') { // using peek and panicking is reasonable.
-          f.get(); // consume newline.
-          song_db.items++; // this is the actual tracking of the index which
-                           // seems silly.
-        } else {
-          if (f.peek() == EOF) { // this catches the case where the file doesn't
-                                 // contain a newline before EOF.
-            f.get();
-            break;
-          }
-          std::cerr << "Error in parser! Expected newline.\n";
-          exit(1); // XXX: Define error numbering properly.
-        }
-        break;
-        
-      default:
-        std::cerr << "Error in FSM! Aborting.\n";
-        // XXX: Define error numbering properly.
-        exit(1);
-        break;
-    }
+    if (f.eof()) break;
+    token = strtok(in, ";");
+    song_db.songs[song_db.items].setTitle(token);
+    token = strtok(nullptr, ";");
+    song_db.songs[song_db.items].setArtist(token);
+    token = strtok(nullptr, ";");
+    song_db.songs[song_db.items].setMinutes(atoi(token));
+    token = strtok(nullptr, ";");
+    song_db.songs[song_db.items].setSeconds(atoi(token));
+    token = strtok(nullptr, ";");
+    song_db.songs[song_db.items].setAlbum(token);
+    song_db.songs[song_db.items].isPopulated = true;
+    song_db.songs[song_db.items].index = ++song_db.items;
   }
   // entire file should be loaded into memory now
   

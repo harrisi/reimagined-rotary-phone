@@ -143,7 +143,7 @@ SongDB::~SongDB() {
     << s.artist << ';'
     << s.minutes << ';'
     << s.seconds << ';'
-    << s.album << ";\n";
+    << s.album << '\n';
   }
   f.close();
   
