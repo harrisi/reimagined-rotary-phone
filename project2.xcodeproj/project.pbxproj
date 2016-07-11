@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C3906C71D33D9BA00C29E71 /* makefile in Sources */ = {isa = PBXBuildFile; fileRef = 3C3906C61D33D9BA00C29E71 /* makefile */; };
 		3C5AB5431D2DAC9F005239ED /* libian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C5AB5411D2DAC9F005239ED /* libian.cpp */; };
 		3C5AB5461D2E05AD005239ED /* vecian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C5AB5441D2E05AD005239ED /* vecian.cpp */; };
 		3C5AB5491D2FA104005239ED /* Songs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C5AB5471D2FA104005239ED /* Songs.cpp */; };
@@ -26,6 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3C3906C61D33D9BA00C29E71 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = makefile; sourceTree = "<group>"; };
 		3C5AB5381D2C9652005239ED /* ideas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ideas; sourceTree = "<group>"; };
 		3C5AB5391D2CC5E7005239ED /* reqs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = reqs; sourceTree = "<group>"; };
 		3C5AB53A1D2D89C4005239ED /* songs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = songs.txt; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 				3C5AB53A1D2D89C4005239ED /* songs.txt */,
 				3C5AB5471D2FA104005239ED /* Songs.cpp */,
 				3C5AB5481D2FA104005239ED /* Songs.hpp */,
+				3C3906C61D33D9BA00C29E71 /* makefile */,
 			);
 			path = project2;
 			sourceTree = "<group>";
@@ -143,6 +146,7 @@
 				3C5AB5431D2DAC9F005239ED /* libian.cpp in Sources */,
 				3C5AB5461D2E05AD005239ED /* vecian.cpp in Sources */,
 				3CF31AC71D2272F000A4F4D2 /* main.cpp in Sources */,
+				3C3906C71D33D9BA00C29E71 /* makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
