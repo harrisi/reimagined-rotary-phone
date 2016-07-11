@@ -59,6 +59,13 @@ public: // I don't like having these internal values be public but I don't have
   Song& setMinutes(const unsigned int);
   Song& setSeconds(const unsigned int);
   Song& setAlbum(const char*);
+#ifdef IANDEBUG
+  const char* getTitle() const;
+  const char* getArtist() const;
+  const unsigned int getMinutes() const;
+  const unsigned int getSeconds() const;
+  const char* getAlbum() const;
+#endif
 };
 
 struct SongDB {

@@ -8,10 +8,39 @@
 
 #include "Songs.hpp"
 
+#ifdef IANDEBUG
+const char* Song::getTitle() const {
+  return _title;
+}
+
+const char* Song::getArtist() const {
+  return _artist;
+}
+
+const unsigned int Song::getMinutes() const {
+  return _minutes;
+}
+
+const unsigned int Song::getSeconds() const {
+  return _seconds;
+}
+
+const char* Song::getAlbum() const {
+  return _album;
+}
+#endif
+
 bool SongDB::print(const int index) const {
   if (!songs[index].isPopulated) return false;
   std::cout
   << "Index: " << index << '\n'
+#ifdef IANDEBUG
+  << "normalized:\n"
+  << "\tTitle: " << songs[index].getTitle() << '\n'
+  << "\tArtist: " << songs[index].getArtist() << '\n'
+  << "\tDuration: " << songs[index].getMinutes() << ':' << songs[index].getSeconds() << '\n'
+  << "\tAlbum: " << songs[index].getAlbum() << '\n'
+#endif
   << "Title: " << songs[index].title << '\n'
   << "Arist: " << songs[index].artist << '\n'
   << "Duration: " << songs[index].minutes << ':' << songs[index].seconds << '\n'

@@ -132,9 +132,24 @@ void remove(SongDB& song_db) {
 }
 
 void doCommand(const char command) {
+  // This could also include manual functionality options such as reading in
+  // from the song DB, saving to the song DB, etc., as well as general
+  // ":help add" sort of syntax that would give more specific details for each
+  // menu option.
   switch (command) {
     case '?':
-      std::cout << "helpful message!\n";
+      std::cout << "This is the help message for searching.\n"
+      << "Searching is currently not fully implemented, but the basic\n"
+      << "structure of a search is [field]: query\n"
+      << "where field is an optional field selector of:\n"
+      << "\ttitle\n"
+      << "\tartist\n"
+      << "\ttime (not currently implemented)\n"
+      << "\talbum\n"
+      << "Using one of these fields as the start of the query allows for more\n"
+      << "specific search functionality. If the field selector is omitted, the\n"
+      << "default behavior is to search for every field for each item. This is\n"
+      << "slower, but is still useful.\n";
       break;
       
     default:
