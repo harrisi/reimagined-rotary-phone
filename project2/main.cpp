@@ -173,7 +173,7 @@ void doCommand(const char command) {
       break;
       
     default:
-      std::cout << "Command not found: " << command << '\n';
+      std::cerr << "Command not found: " << command << '\n';
       break;
   }
 }
