@@ -2,6 +2,7 @@
 #include <cstring>
 #include <limits>
 #include <fstream>
+#include <cstdlib>
 #include "libian.hpp"
 #include "Songs.hpp"
 
@@ -80,21 +81,24 @@ void add(SongDB& song_db) {
   // object to the db passed to it.
   std::cout << "Song title: ";
   getString(buf);
-  std::strncpy(song_db.songs[song_db.items].title, buf, MAX_STRING_SIZE);
-  
+  song_db.songs[song_db.items].setTitle(buf);
+  //std::strncpy(song_db.songs[song_db.items].title, buf, MAX_STRING_SIZE);
   std::cout << "Song artist: ";
+  
   getString(buf);
-  std::strncpy(song_db.songs[song_db.items].artist, buf, MAX_STRING_SIZE);
+  song_db.songs[song_db.items].setArtist(buf);
+  //std::strncpy(song_db.songs[song_db.items].artist, buf, MAX_STRING_SIZE);
   
   std::cout << "Song minutes: ";
-  song_db.songs[song_db.items].minutes = getInt(0);
+  song_db.songs[song_db.items].setMinutes(getInt(0));
   
   std::cout << "Song seconds: ";
-  song_db.songs[song_db.items].seconds = getInt(0, 59);
+  song_db.songs[song_db.items].setSeconds(getInt(0, 59));
   
   std::cout << "Song album: ";
   getString(buf);
-  std::strncpy(song_db.songs[song_db.items].album, buf, MAX_STRING_SIZE);
+  song_db.songs[song_db.items].setAlbum(buf);
+  //std::strncpy(song_db.songs[song_db.items].album, buf, MAX_STRING_SIZE);
   
   song_db.songs[song_db.items].isPopulated = true;
   
@@ -115,11 +119,13 @@ void remove(SongDB& song_db) {
   }
   // could check if equal here for some extra cool maybe efficiency!
   while (++input < song_db.items) {
-    std::strcpy(song_db.songs[input - 1].title, song_db.songs[input].title);
-    std::strcpy(song_db.songs[input - 1].artist, song_db.songs[input].artist);
-    song_db.songs[input - 1].minutes = song_db.songs[input].minutes;
-    song_db.songs[input - 1].seconds = song_db.songs[input].seconds;
-    std::strcpy(song_db.songs[input - 1].album, song_db.songs[input].album);
+    // As a consequence of the changes, I can now chain these methods for some
+    // neat looking calls.
+    song_db.songs[input - 1].setTitle(song_db.songs[input].title)
+      .setArtist(song_db.songs[input].artist)
+      .setMinutes(song_db.songs[input].minutes)
+      .setSeconds(song_db.songs[input].seconds)
+      .setAlbum(song_db.songs[input].album);
   }
   song_db.songs[--song_db.items].isPopulated = false;
   //song_db.items--;
@@ -149,7 +155,7 @@ void search(const SongDB& song_db) { // should return something.
   char lookahead = -1;
   bool startOf = true;
   bool stop = false;
-  char query[MAX_STRING_SIZE] {0}; // holds actual query. This will exclude
+  char query[MAX_STRING_SIZE] = {}; // holds actual query. This will exclude
                                    // specific "category" to search for.
   // Decide how to search (assignment requires artist and album)
   //std::cout << "Search for artist or album? ";
@@ -183,7 +189,7 @@ void search(const SongDB& song_db) { // should return something.
         } else {
           mode = strToMode(query);
           // clear query
-          std::memset(query, '\0', sizeof query);
+          memset(query, '\0', sizeof query);
         }
         break;
         
@@ -268,27 +274,30 @@ void loadFile(SongDB& song_db, const char delim) {
     // title;artist;mm;ss;album
     switch (fsm) {
       case TITLE:
-        std::strncpy(song_db.songs[song_db.items].title, in, MAX_STRING_SIZE);
+        song_db.songs[song_db.items].setTitle(in);
+        //std::strncpy(song_db.songs[song_db.items].title, in, MAX_STRING_SIZE);
         fsm = ARTIST;
         break;
         
       case ARTIST:
-        std::strncpy(song_db.songs[song_db.items].artist, in, MAX_STRING_SIZE);
+        song_db.songs[song_db.items].setArtist(in);
+        //std::strncpy(song_db.songs[song_db.items].artist, in, MAX_STRING_SIZE);
         fsm = MINUTES;
         break;
         
       case MINUTES:
-        song_db.songs[song_db.items].minutes = static_cast<unsigned int>(atoi(in));
+        song_db.songs[song_db.items].setMinutes(static_cast<unsigned int>(atoi(in)));
         fsm = SECONDS;
         break;
         
       case SECONDS:
-        song_db.songs[song_db.items].seconds = static_cast<unsigned int>(atoi(in));
+        song_db.songs[song_db.items].setSeconds(static_cast<unsigned int>(atoi(in)));
         fsm = ALBUM;
         break;
         
       case ALBUM:
-        std::strncpy(song_db.songs[song_db.items].album, in, MAX_STRING_SIZE);
+        song_db.songs[song_db.items].setAlbum(in);
+        //std::strncpy(song_db.songs[song_db.items].album, in, MAX_STRING_SIZE);
         fsm = TITLE;
         song_db.songs[song_db.items].isPopulated = true;
         // XXX: I hate this.

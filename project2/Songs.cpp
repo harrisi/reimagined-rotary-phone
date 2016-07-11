@@ -84,6 +84,39 @@ SongDB::~SongDB() {
   std::cout << "\nThanks for using Ian's music manager!\n";
 }
 
+Song& Song::setTitle(const char *val) {
+  strncpy(title, val, MAX_STRING_SIZE);
+  strncpy(_title, val, MAX_STRING_SIZE);
+  normalize(_title);
+  return *this;
+}
+
+Song& Song::setArtist(const char *val) {
+  strncpy(artist, val, MAX_STRING_SIZE);
+  strncpy(_artist, val, MAX_STRING_SIZE);
+  normalize(_artist);
+  return *this;
+}
+
+Song& Song::setMinutes(const unsigned int val) {
+  minutes = val;
+  _minutes = val;
+  return *this;
+}
+
+Song& Song::setSeconds(const unsigned int val) {
+  seconds = val;
+  _seconds = val;
+  return *this;
+}
+
+Song& Song::setAlbum(const char *val) {
+  strncpy(album, val, MAX_STRING_SIZE);
+  strncpy(_album, val, MAX_STRING_SIZE);
+  normalize(_album);
+  return *this;
+}
+
 Mode strToMode(const char* mode) {
   char lower[10];
   for (size_t i = 0; i < strlen(mode); i++) {

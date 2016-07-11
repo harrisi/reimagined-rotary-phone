@@ -24,7 +24,20 @@ enum Mode {
 };
 
 // private is best, but I don't want to deal with that right now.
-struct Song {
+class Song {
+private:
+// private, "normalized" values
+  char _title[MAX_STRING_SIZE];
+  char _artist[MAX_STRING_SIZE];
+  unsigned int _minutes;
+  unsigned int _seconds;
+  char _album[MAX_STRING_SIZE];
+  
+  // public "consumable" values.
+  
+public: // I don't like having these internal values be public but I don't have
+        // time to model it correctly. I need to quit my job.
+  
   // I could model this object better and define a destructor that would do all
   // the cleanup for me for free. This would probably be my favorite approach,
   // but it would require remodelling the whole program flow, most likely. For
@@ -41,6 +54,11 @@ struct Song {
   // have very constrained memory usage or disk space.
   char album[MAX_STRING_SIZE];
   bool isPopulated;
+  Song& setTitle(const char*);
+  Song& setArtist(const char*);
+  Song& setMinutes(const unsigned int);
+  Song& setSeconds(const unsigned int);
+  Song& setAlbum(const char*);
 };
 
 struct SongDB {

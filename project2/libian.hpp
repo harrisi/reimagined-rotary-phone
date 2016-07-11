@@ -21,10 +21,17 @@ const int MAX_STRING_SIZE = 1000;
 
 // Maximum amount of songs possible. I might try increasing this to 50k to mimic
 // Google Play Music's capacity.
-const int MAX_SONG_DB_SIZE = 2000;
+
+// So this is the reason I've been having so many problems. I can't prove it,
+// but I'm definitely getting a stack overflow. I'm sure I'm running out of
+// memory because everything is initiazlied, and it's taking up a crazy amount
+// of memory. I really wish I could use strings. This is silly.
+const int MAX_SONG_DB_SIZE = 1000;
 
 void getString(char*);
-int getInt(const int = std::numeric_limits<int>::lowest(),
+int getInt(const int = std::numeric_limits<int>::min(),
            const int = std::numeric_limits<int>::max());
+
+void normalize(char*);
 
 #endif /* libian_hpp */
