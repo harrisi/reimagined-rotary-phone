@@ -123,16 +123,14 @@ void remove(SongDB& song_db) {
   // could check if equal here for some extra cool maybe efficiency!
   while (++input < song_db.items) {
     // As a consequence of the changes, I can now chain these methods for some
-    // neat looking calls.
+    // neat looking calls. Cool!
     song_db.songs[input - 1].setTitle(song_db.songs[input].title)
       .setArtist(song_db.songs[input].artist)
       .setMinutes(song_db.songs[input].minutes)
       .setSeconds(song_db.songs[input].seconds)
       .setAlbum(song_db.songs[input].album);
-    song_db.songs[input].index--;
   }
   song_db.songs[--song_db.items].isPopulated = false;
-  //song_db.items--;
 }
 
 void doCommand(const char command) {
