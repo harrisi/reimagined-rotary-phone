@@ -203,7 +203,29 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                     results[count++] = songs[i];
                   }
             }
-            break;
+            break; // case '>'
+            
+          case '!': // !
+            if (strlen(cmpmethod) == 2) {
+              if (cmpmethod[1] == '=') { // !=
+                if (songs[i].minutes != minutes ||
+                    (songs[i].minutes == minutes &&
+                     songs[i].seconds != seconds)) {
+                      results[count++] = songs[i];
+                    }
+              } else {
+                std::cerr << "Didn't understand comparison operator: "
+                << cmpmethod << '\n';
+                return false;
+              }
+            } else { // ! (note: I'm not sure if I like allowing this operator)
+              if (songs[i].minutes != minutes ||
+                  (songs[i].minutes == minutes &&
+                   songs[i].seconds != seconds)) {
+                    results[count++] = songs[i];
+                  }
+            }
+            break; // case '!'
         }
       }
       break; // case TIME
