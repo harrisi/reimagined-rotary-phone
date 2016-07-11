@@ -51,7 +51,7 @@ title;artist;minute;second;album
 
 [x] search by song name
 
-[ ] search by time
+[x] search by time
 
 [ ] regex search (search for "justin*" will return "justin bieber" and "justin
       timberlake")
