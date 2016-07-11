@@ -155,7 +155,7 @@ void doCommand(const char command) {
       << "where field is an optional field selector of:\n"
       << "\ttitle\n"
       << "\tartist\n"
-      << "\ttime (not currently implemented)\n"
+      << "\ttime\n"
       << "\talbum\n"
       << "Using one of these fields as the start of the query allows for more\n"
       <<
@@ -183,6 +183,7 @@ void search(const SongDB& song_db) { // should return something.
   char lookahead = -1;
   bool startOf = true;
   bool stop = false;
+  bool modeset = false;
   Song results[100]; // Arbitrary number. Memory allocation is a beach.
   char query[MAX_STRING_SIZE] = {}; // Holds actual query. This will exclude
                                     // specific "category" to search for.
@@ -224,10 +225,13 @@ void search(const SongDB& song_db) { // should return something.
       case ':':
         if (startOf) {
           doCommand(lookahead);
-        } else {
+        } else if (!modeset) {
           mode = strToMode(query);
           // clear query
           memset(query, '\0', sizeof query);
+          modeset = true;
+        } else {
+          query[strlen(query)] = buf;
         }
         break;
         

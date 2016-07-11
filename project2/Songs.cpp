@@ -84,13 +84,17 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
   
   int count = 0;
   char norm_query[MAX_STRING_SIZE] = {};
+  char *token;
+  char *cmpmethod; // used for time search query
+  unsigned int minutes = 0;
+  unsigned int seconds = 0;
   strncpy(norm_query, query, strlen(query));
-  normalize(norm_query);
+  if (!(mode == TIME))
+    normalize(norm_query);
   
   switch (mode) {
     case TITLE:
       for (int i = 0; i <= items; i++) {
-        // if query
         if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
@@ -99,7 +103,6 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       
     case ARTIST:
       for (int i = 0; i <= items; i++) {
-        // if query
         if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
@@ -108,7 +111,6 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       
     case ALBUM:
       for (int i = 0; i <= items; i++) {
-        // if query
         if (strstr(songs[i].getAlbum(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
@@ -117,9 +119,66 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       
     case TIME:
       // search for time. this will be fun!
-      std::cout << "Time searching not yet implemented!\n"
-      << "Using default search.\n";
-      //break;
+      token = strtok(norm_query, " ");
+      cmpmethod = token;
+      // using a tokenizer, get each actual piece of information.
+      token = strtok(nullptr, ":");
+      minutes = atoi(token);
+      token = strtok(nullptr, "\0");
+      seconds = atoi(token);
+      for (int i = 0; i <= items; i++) {
+        switch (cmpmethod[0]) {
+          case '<':
+            if (strlen(cmpmethod) == 2) {
+              if (cmpmethod[1] == '=') { // <=
+                if (songs[i].minutes < minutes ||
+                    (songs[i].minutes == minutes &&
+                     songs[i].seconds <= seconds)) {
+                      results[count++] = songs[i];
+                    }
+              } else {
+                std::cerr << "Didn't understand comparison operator: "
+                << cmpmethod << '\n';
+              }
+            } else { // <
+              if (songs[i].minutes < minutes ||
+                  (songs[i].minutes == minutes &&
+                   songs[i].seconds < seconds)) {
+                    results[count++] = songs[i];
+                  }
+            }
+            break;
+            
+          case '=': // =
+            if (songs[i].minutes == minutes &&
+                songs[i].seconds == seconds) {
+              results[count++] = songs[i];
+            }
+            break;
+            
+          case '>':
+            if (strlen(cmpmethod) == 2) {
+              if (cmpmethod[1] == '=') { // >=
+                if (songs[i].minutes > minutes ||
+                    (songs[i].minutes == minutes &&
+                     songs[i].seconds >= seconds)) {
+                      results[count++] = songs[i];
+                    }
+              } else {
+                std::cerr << "Didn't understand comparison operator: "
+                << cmpmethod << '\n';
+              }
+            } else { // >
+              if (songs[i].minutes > minutes ||
+                  (songs[i].minutes == minutes &&
+                   songs[i].seconds > seconds)) {
+                    results[count++] = songs[i];
+                  }
+            }
+            break;
+        }
+      }
+      break;
       
     default:
       for (int i = 0; i <= items; i++) {
