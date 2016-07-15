@@ -248,7 +248,7 @@ void loadFile(SongDB& song_db, const char delim) {
   } fsm = TITLE;
   char in[MAX_STRING_SIZE];
   std::ifstream
-  f("/Users/ian/misc/school/cs162/projects/project2/project2/songs.txt");
+  f("songs.txt");
   //Items fsm = TITLE;
   //int i = 0; // this overwrites from the beginning every time.
   //f.open;
