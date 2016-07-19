@@ -30,6 +30,14 @@ int getInt(const int min, const int max) {
   return res;
 }
 
+void lowercase(char *val) {
+  char *i = val;
+  while (*i) {
+    *i = tolower(*i);
+    i++;
+  }
+}
+
 // I don't really like the naming, but whatever.
 void normalize(char *val) {
   char *i = val;

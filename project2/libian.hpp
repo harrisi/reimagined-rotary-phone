@@ -38,6 +38,7 @@ void getString(char*);
 int getInt(const int = std::numeric_limits<int>::min(),
            const int = std::numeric_limits<int>::max());
 
+void lowercase(char*);
 void normalize(char*);
 bool isInt(const char*);
 
