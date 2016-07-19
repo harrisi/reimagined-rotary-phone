@@ -12,6 +12,7 @@
 #include <iostream>
 #include <limits>
 #include <cctype>
+#include <cstring>
 
 //#include "vecian.hpp"
 
