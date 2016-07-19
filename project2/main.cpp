@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <cstring>
 #include <limits>
 #include <fstream>
@@ -9,42 +10,145 @@
 char doMenu();
 void add(SongDB&);
 void remove(SongDB&);
-void search(const SongDB&);
+void search(const SongDB&, std::istream& = std::cin);
 void view(const SongDB&);
+void help();
 
 // May want to move elsewhere and abstract away some of the details.
 void loadFile(SongDB&, const char* = ";");
 
+void doMenuEx(SongDB&);
+void doCommand(const char);
+void doCommandEx(const char*);
+
 int main() {
-  char input;
   std::cout << "Welcome to Ian's music library program!\n";
   SongDB songs;
   loadFile(songs);
-  while ((input = doMenu()) != 'q') {
-    switch (tolower(input)) {
-      case 'a':
-        add(songs);
-        break;
-        
-      case 'r':
-        remove(songs);
-        break;
-        
-      case 's':
-        search(songs);
-        break;
-        
-      case 'v':
-        view(songs);
-        break;
-        
-      default:
-        std::cout << "Invalid input! Try again:\n";
-        break;
-    }
-  }
-  
+  doMenuEx(songs);
   return 0;
+}
+
+void help() {
+  char *token = strtok(nullptr, "\t\n ");
+  if (!token) {// help had no arguments"
+    std::cout << "HELP\n"
+    << "This is general information about the program and how to use it. For\n"
+    << "information about a specific feature, try passing an argument to help\n"
+    << "from the main menu. Valid arguments are:\n"
+    << "\tADD:\tinformation about adding a song to the library.\n"
+    << "\tREMOVE:\tinformation about removing a song from the library.\n"
+    << "\tSEARCH:\tinformation about searching for a song in the library.\n"
+    << "\tVIEW:\tinformation about viewing all songs in the library.\n"
+    << "\tQUIT:\tinformation about quitting the program.\n";
+    // Here I would like to include more general information about the program
+    // such as some clarifications of what a menu, submenu, field, query, etc.
+    // are. Also it could detail the actual logical program flow of the program.
+    return;
+  }
+  if (strncmp(token, "add", maxlen(token, "add")) == 0) {
+    std::cout << "HELP ADD\n"
+    << "Adding a song is a straightforward sequential process. To add a song,\n"
+    << "enter 'add' at the main menu when prompted for entry. You will then\n"
+    << "guided through a series of steps to enter aspects of the song, which\n"
+    << "are the song title, artist, duration, and album.\n";
+  } else if (strncmp(token, "remove", maxlen(token, "remove")) == 0) {
+    std::cout << "HELP REMOVE\n"
+    << "Removing a song can be done by typing 'remove' at the main menu when\n"
+    << "prompted for entry. You will then be asked for the index of the song\n"
+    << "to be removed. If you are cannot remember the index of the song you\n"
+    << "wish to delete, you can alternatively give the remove option a search\n"
+    << "query, which can return a selection of songs and will return you to\n"
+    << "the removal operation, which allows you to again enter the index.\n";
+  } else if (strncmp(token, "search", maxlen(token, "search")) == 0) {
+    std::cout << "HELP SEARCH\n"
+    << "Searching for a song can be difficult in large libraries. To make the\n"
+    << "process easier, there are a number of options available for\n"
+    << "searching. Search results can be narrowed by specifying the 'field'\n"
+    << "you are interested in, e.g., 'artist: pink floyd' will return all of\n"
+    << "the songs in your library with an artist matching 'pink floyd'. For\n"
+    << "more information about searching, the search submenu gives more\n"
+    << "specific information.\n";
+  } else if (strncmp(token, "view", maxlen(token, "view")) == 0) {
+    std::cout << "HELP VIEW\n"
+    << "The view option will just give a dump of all songs in your library.\n"
+    << "This functionality is not as useful as searching as the library grows\n"
+    << "but can be useful if you just want a complete overview of the library\n"
+    << "for whatever reason. This can also be accomplished by searching for\n"
+    << "an empty string, i.e., type nothing before pressing enter in the\n"
+    << "search submenu.\n";
+  } else if (strncmp(token, "quit", maxlen(token, "quit")) == 0) {
+    std::cout << "HELP QUIT\n"
+    << "Quitting the program will write the in-memory music library to disk\n"
+    << "in the file used to initially read the music library on startup. Note\n"
+    << "that this will overwrite any modifications to the file that were made\n"
+    << "to the music file while this program was running. This behavior is\n"
+    << "expected to change in a future release.\n";
+  } else {
+    std::cout << "Couldn't understand help message option.\n";
+  }
+}
+
+void doCommandEx(const char *tok) {
+  if (strncmp(tok, "help", strlen("help")) == 0) {
+    help();
+  } else if (strncmp(tok, "?", strlen("?")) == 0) {
+    std::cout << "got '?'\n";
+  }
+}
+
+void doMenuEx(SongDB& songs) {
+  char in[MAX_STRING_SIZE], *token;
+  bool quit = false;
+  do {
+    std::cout << "Options:\n"
+    << "(Add) a song.\n"
+    << "(Remove) a song.\n"
+    << "(Search) for a song.\n"
+    << "(View) all songs.\n"
+    << "(Help)\n"
+    << "(Quit).\n"
+    << "Enter one of the above words in parentheses (parentheses not required)."
+    << '\n';
+    //<< "Selection> ";
+    getString(in, "Selection> ");
+    token = strtok(in, "\t\n ");
+    normalize(token);
+    std::cout << "token: " << token << '\n';
+    if (token[0] == ':') {
+      doCommandEx(&token[1]);
+    } else {
+      if (strncmp(token, "add", strlen("add")) == 0 ||
+          strncmp(token, "a", strlen("a")) == 0) {
+        add(songs);
+      } else if (strncmp(token, "remove", maxlen(token, "remove")) == 0 ||
+                 strncmp(token, "r", strlen(token)) == 0) {
+        remove(songs);
+      } else if (strncmp(token, "search", maxlen(token, "search")) == 0 ||
+                 strncmp(token, "s", strlen(token)) == 0) {
+        search(songs);
+      } else if (strncmp(token, "view", maxlen(token, "view")) == 0 ||
+                 strncmp(token, "v", strlen(token)) == 0) {
+        view(songs);
+      } else if (strncmp(token, "help", maxlen(token, "help")) == 0 ||
+                 strncmp(token, "h", strlen(token)) == 0) {
+        help();
+      } else if (strncmp(token, "quit", maxlen(token, "quit")) == 0 ||
+                 strncmp(token, "q", strlen(token)) == 0) {
+        quit = true;
+      } else {
+        std::cout << "Didn't understand '" << token << "'.\n";
+        continue;
+      }
+    }
+    if (!std::cin) {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  } while (!quit);
+//  while ((token = strtok(nullptr, "\t\n "))) {
+//    std::cout << "TOKEN: " << token << '\n';
+//  }
 }
 
 char doMenu() {
@@ -81,16 +185,16 @@ void add(SongDB& song_db) {
   // loadFile to some function ("songFromStream" or the like) which reads in a
   // stream of delimiter separated values from a stringstream and adds a song
   // object to the db passed to it.
-  std::cout << "Song title: ";
-  getString(buf);
+  //std::cout << "Song title: ";
+  getString(buf, "Song title: ");
   song_db.songs[song_db.items].setTitle(buf);
-  std::cout << "Song artist: ";
+  //std::cout << "Song artist: ";
   
-  getString(buf);
+  getString(buf, "Song artist: ");
   song_db.songs[song_db.items].setArtist(buf);
   
-  std::cout << "Song duration (e.g. '4:20'): ";
-  getString(buf);
+  //std::cout << "Song duration (e.g. '4:20'): ";
+  getString(buf, "Song duration (e.g. '4:20'): ");
   minutes = strtok(buf, ":");
   if (minutes != nullptr)
     seconds = strtok(nullptr, "\n");
@@ -101,7 +205,7 @@ void add(SongDB& song_db) {
          !isInt(seconds) || // ..or seconds isn't an int..
          atoi(seconds) < 0 || // ..or seconds is less than 0..
          atoi(seconds) > 59) { // ..or seconds is greater than 59.
-    std::cout << "Invalid input! Try again: ";
+    //std::cout << "Invalid input! Try again: ";
     getString(buf);
     minutes = strtok(buf, ":");
     if (minutes != nullptr)
@@ -112,8 +216,8 @@ void add(SongDB& song_db) {
   song_db.songs[song_db.items].setMinutes(atoi(minutes));
   song_db.songs[song_db.items].setSeconds(atoi(seconds));
   
-  std::cout << "Song album: ";
-  getString(buf);
+  //std::cout << "Song album: ";
+  getString(buf, "Song album: ");
   song_db.songs[song_db.items].setAlbum(buf);
   
   song_db.songs[song_db.items].isPopulated = true;
@@ -129,13 +233,34 @@ void add(SongDB& song_db) {
 // deal with all the organization of the db.
 void remove(SongDB& song_db) {
   int input;
-  std::cout
-  << "Which song would you like to remove? (Numeric index, i.e., 42): ";
-  while ((input = getInt()) < 0 || input >= song_db.items) {
-    std::cout << "Index out of range! Try again: ";
-  } // I don't like this because it forces the user to delete an item. If they
+  char *token;
+  token = strtok(nullptr, "\t\n ");
+  if (token) {
+    if (isInt(token)) {
+      input = atoi(token);
+      if (input < 0 || input >= song_db.items) {
+        std::cerr << "Index out of range!\n";
+        return;
+      }
+    } else { // "remove someQuery"
+      std::stringstream teststream;
+      do {
+        normalize(token);
+        teststream << token << ' ';
+      } while ((token = strtok(nullptr, "\t\n ")));
+      search(song_db, teststream);
+      goto lol;
+    }
+  } else {
+  lol:
+    std::cout
+    << "Which song would you like to remove? (Numeric index, i.e., 42): ";
+    while ((input = getInt()) < 0 || input >= song_db.items) {
+      std::cout << "Index out of range! Try again: ";
+    } // I don't like this because it forces the user to delete an item. If they
     // accidentally get here, they are forced to delete something or force exit
     // the program.
+  }
   // Could check if equal here for some extra cool maybe efficiency!
   while (++input < song_db.items) {
     // As a consequence of the changes, I can now chain these methods for some
@@ -270,7 +395,7 @@ void doCommand(const char command) {
 }
 
 // Should also be a member function, I think.
-void search(const SongDB& song_db) { // should return something (?)
+void search(const SongDB& song_db, std::istream& stream) { // should return something (?)
   // I don't know if it should return an array of songs or a specific search
   // object. A search object seems kind of nice. It would contain an array of
   // Song objects and just be populated with search results. Handling indexing
@@ -314,19 +439,22 @@ void search(const SongDB& song_db) { // should return something (?)
   while (!stop) {
     if (lookahead != -1) { // If lookahead has usable value, use it.
       buf = lookahead;
-      if ((lookahead = getchar()) == EOF || // This fills lookahead again.
+      if ((lookahead = stream.get()) == EOF || // This fills lookahead again.
           lookahead == '\n') stop = true;
       startOf = false;
     } else { // Should only happen on first loop.
-      if ((buf = getchar()) == EOF || buf == '\n') break; // Fill buf.
+      if ((buf = stream.get()) == EOF || buf == '\n') break; // Fill buf.
       // Fill lookahead.
-      stop = (lookahead = getchar()) == EOF || lookahead == '\n';
+      stop = (lookahead = stream.get()) == EOF || lookahead == '\n';
     }
     switch (buf) {
       case ':':
         if (startOf) { // If ':' is the first character, it's a command. Use
                        // lookahead as the command.
           doCommand(lookahead);
+          //goto lol;
+          stream.clear();
+          stream.ignore();
           return;
           // This feels very weird, but the purpose of this is so that the user
           // can use ':' after the mode. Time searching was giving me problems.
