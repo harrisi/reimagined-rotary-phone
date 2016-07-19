@@ -34,7 +34,7 @@ const int MAX_SONG_DB_SIZE = 1000;
 // I don't have time to do anything about it!
 const int MAX_RESULT_SIZE = 100;
 
-void getString(char*);
+void getString(char*, const char* = "Invalid input! Try again: ");
 int getInt(const int = std::numeric_limits<int>::min(),
            const int = std::numeric_limits<int>::max());
 

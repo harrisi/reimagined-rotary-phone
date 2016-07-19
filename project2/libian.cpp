@@ -8,11 +8,14 @@
 
 #include "libian.hpp"
 
-void getString(char *buf) {
+void getString(char *buf, const char *msg) {
+  std::cout << msg;
   while(!std::cin.get(buf, MAX_STRING_SIZE - 1)) {
+    if (std::cin.eof())
+      return;
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cout << "Invalid input! Try again: ";
+    std::cout << msg;
   }
   std::cin.clear();
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
