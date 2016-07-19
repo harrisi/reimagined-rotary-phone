@@ -59,3 +59,8 @@ bool isInt(const char* val) {
   }
   return true;
 }
+
+// Returns the length of the larger string
+size_t maxlen(const char *a, const char *b) {
+  return (strlen(a) >= strlen(b) ? strlen(a) : strlen(b));
+}

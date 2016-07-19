@@ -41,5 +41,6 @@ int getInt(const int = std::numeric_limits<int>::min(),
 void lowercase(char*);
 void normalize(char*);
 bool isInt(const char*);
+size_t maxlen(const char*, const char*);
 
 #endif /* libian_hpp */
