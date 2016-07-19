@@ -110,11 +110,12 @@ void doMenuEx(SongDB& songs) {
     << "(Quit).\n"
     << "Enter one of the above words in parentheses (parentheses not required)."
     << '\n';
-    //<< "Selection> ";
     getString(in, "Selection> ");
     token = strtok(in, "\t\n ");
     normalize(token);
+#ifdef IANDEBUG
     std::cout << "token: " << token << '\n';
+#endif
     if (token[0] == ':') {
       doCommandEx(&token[1]);
     } else {
