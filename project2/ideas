@@ -47,3 +47,10 @@ Full parser
     "... given a grammar ..." perhaps more realisitcally, be given a _context_,
     i.e., 'search' or 'file' or 'time' or something of the sort. This would
     dictate how it would actually parse text.
+
+Song IDs
+  Songs should really have a proper ID. This would allow the removal of the
+  `index` field in the Song class. Having an ID would also mean that results for
+  searches would be less complicated. It may be more confusing on small lists,
+  though. I really don't know. Either way, it would allow using both forms,
+  which is nice, I guess.
