@@ -10,23 +10,35 @@
 #include "Songs.hpp"
 
 const char* Song::getTitle() const {
-  return _title;
+  return title;
+}
+
+const char* Song::getNormTitle() const {
+  return norm_title;
 }
 
 const char* Song::getArtist() const {
-  return _artist;
+  return artist;
 }
 
-unsigned int Song::getMinutes() { // Unnecessary; keeping for consistency.
+const char* Song::getNormArtist() const {
+  return norm_artist;
+}
+
+unsigned int Song::getMinutes() const{
   return minutes;
 }
 
-unsigned int Song::getSeconds() { // Unnecessary; keeping for consistency.
+unsigned int Song::getSeconds() const {
   return seconds;
 }
 
 const char* Song::getAlbum() const {
-  return _album;
+  return album;
+}
+
+const char* Song::getNormAlbum() const {
+  return norm_album;
 }
 
 void Song::print() const {
@@ -35,10 +47,10 @@ void Song::print() const {
   << "Index: " << index << '\n'
 #ifdef IANDEBUG
   << "normalized:\n"
-  << "\tTitle: " << getTitle() << '\n'
-  << "\tArtist: " << getArtist() << '\n'
-  << "\tDuration: " << getMinutes() << ':' << getSeconds() << '\n'
-  << "\tAlbum: " << getAlbum() << '\n'
+  << "\tTitle: " << norm_title << '\n'
+  << "\tArtist: " << norm_artist << '\n'
+  << "\tDuration: " << minutes << ':' << seconds << '\n'
+  << "\tAlbum: " << norm_album << '\n'
 #endif
   << "Title: " << title << '\n'
   << "Arist: " << artist << '\n'
@@ -98,7 +110,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
     case TITLE:
       for (int i = 0; i <= items; i++) {
         if (count >= MAX_RESULT_SIZE) break;
-        if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
+        if (strstr(songs[i].getNormTitle(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
       }
@@ -107,7 +119,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
     case ARTIST:
       for (int i = 0; i <= items; i++) {
         if (count >= MAX_RESULT_SIZE) break;
-        if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
+        if (strstr(songs[i].getNormArtist(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
       }
@@ -116,7 +128,7 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
     case ALBUM:
       for (int i = 0; i <= items; i++) {
         if (count >= MAX_RESULT_SIZE) break;
-        if (strstr(songs[i].getAlbum(), norm_query) != nullptr) {
+        if (strstr(songs[i].getNormAlbum(), norm_query) != nullptr) {
           results[count++] = songs[i];
         }
       }
@@ -156,9 +168,9 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
           case '<':
             if (strlen(cmpmethod) == 2) {
               if (cmpmethod[1] == '=') { // <=
-                if (songs[i].minutes < minutes ||
-                    (songs[i].minutes == minutes &&
-                     songs[i].seconds <= seconds)) {
+                if (songs[i].getMinutes() < minutes ||
+                    (songs[i].getMinutes() == minutes &&
+                     songs[i].getSeconds() <= seconds)) {
                       if (count >= MAX_RESULT_SIZE) break;
                       results[count++] = songs[i];
                     }
@@ -168,9 +180,9 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                 return false;
               }
             } else { // <
-              if (songs[i].minutes < minutes ||
-                  (songs[i].minutes == minutes &&
-                   songs[i].seconds < seconds)) {
+              if (songs[i].getMinutes() < minutes ||
+                  (songs[i].getMinutes() == minutes &&
+                   songs[i].getSeconds() < seconds)) {
                     if (count >= MAX_RESULT_SIZE) break;
                     results[count++] = songs[i];
                   }
@@ -184,8 +196,8 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
               << cmpmethod << '\n';
               return false;
             }
-            if (songs[i].minutes == minutes &&
-                songs[i].seconds == seconds) {
+            if (songs[i].getMinutes() == minutes &&
+                songs[i].getSeconds() == seconds) {
               if (count >= MAX_RESULT_SIZE) break;
               results[count++] = songs[i];
             }
@@ -194,9 +206,9 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
           case '>':
             if (strlen(cmpmethod) == 2) {
               if (cmpmethod[1] == '=') { // >=
-                if (songs[i].minutes > minutes ||
-                    (songs[i].minutes == minutes &&
-                     songs[i].seconds >= seconds)) {
+                if (songs[i].getMinutes() > minutes ||
+                    (songs[i].getMinutes() == minutes &&
+                     songs[i].getSeconds() >= seconds)) {
                       if (count >= MAX_RESULT_SIZE) break;
                       results[count++] = songs[i];
                     }
@@ -206,9 +218,9 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                 return false;
               }
             } else { // >
-              if (songs[i].minutes > minutes ||
-                  (songs[i].minutes == minutes &&
-                   songs[i].seconds > seconds)) {
+              if (songs[i].getMinutes() > minutes ||
+                  (songs[i].getMinutes() == minutes &&
+                   songs[i].getMinutes() > seconds)) {
                     if (count >= MAX_RESULT_SIZE) break;
                     results[count++] = songs[i];
                   }
@@ -218,9 +230,9 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
           case '!': // !
             if (strlen(cmpmethod) == 2) {
               if (cmpmethod[1] == '=') { // !=
-                if (songs[i].minutes != minutes ||
-                    (songs[i].minutes == minutes &&
-                     songs[i].seconds != seconds)) {
+                if (songs[i].getMinutes() != minutes ||
+                    (songs[i].getMinutes() == minutes &&
+                     songs[i].getSeconds() != seconds)) {
                       if (count >= MAX_RESULT_SIZE) break;
                       results[count++] = songs[i];
                     }
@@ -230,9 +242,9 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
                 return false;
               }
             } else { // ! (note: I'm not sure if I like allowing this operator)
-              if (songs[i].minutes != minutes ||
-                  (songs[i].minutes == minutes &&
-                   songs[i].seconds != seconds)) {
+              if (songs[i].getMinutes() != minutes ||
+                  (songs[i].getMinutes() == minutes &&
+                   songs[i].getSeconds() != seconds)) {
                     if (count >= MAX_RESULT_SIZE) break;
                     results[count++] = songs[i];
                   }
@@ -244,13 +256,13 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
       
     default:
       for (int i = 0; i <= items; i++) {
-        if (strstr(songs[i].getTitle(), norm_query) != nullptr) {
+        if (strstr(songs[i].getNormTitle(), norm_query) != nullptr) {
           if (count >= MAX_RESULT_SIZE) break;
           results[count++] = songs[i];
-        } else if (strstr(songs[i].getArtist(), norm_query) != nullptr) {
+        } else if (strstr(songs[i].getNormArtist(), norm_query) != nullptr) {
           if (count >= MAX_RESULT_SIZE) break;
           results[count++] = songs[i];
-        } else if (strstr(songs[i].getAlbum(), norm_query) != nullptr) {
+        } else if (strstr(songs[i].getNormAlbum(), norm_query) != nullptr) {
           if (count >= MAX_RESULT_SIZE) break;
           results[count++] = songs[i];
         }
@@ -264,32 +276,37 @@ bool SongDB::search(const char *query, Song results[], const Mode mode) const {
 
 SongDB::~SongDB() {
   std::ofstream f("songs.txt");
-  for (auto s : songs) {
+  for (int i = 0; i < items; i++) {
     // quit on first unpopulated entry.
-    if (!s.isPopulated) break;
-    f << s.title << ';'
-    << s.artist << ';'
-    << s.minutes << ';'
+    if (!songs[i].isPopulated) break;
+    f << songs[i].getTitle() << ';'
+    << songs[i].getArtist() << ';'
+    << songs[i].getMinutes() << ';'
     << std::setfill('0') << std::setw(2)
-    << s.seconds << ';'
-    << s.album << '\n';
+    << songs[i].getSeconds() << ';'
+    << songs[i].getAlbum() << '\n';
   }
   f.close();
+  free(songs);
   
   std::cout << "\nThanks for using Ian's music manager!\n";
 }
 
+SongDB::SongDB() {
+  songs = new Song();
+}
+
 Song& Song::setTitle(const char *val) {
-  strncpy(title, val, MAX_STRING_SIZE);
-  strncpy(_title, val, MAX_STRING_SIZE);
-  normalize(_title);
+  title = strdup(val);
+  norm_title = strdup(val);
+  normalize(norm_title);
   return *this;
 }
 
 Song& Song::setArtist(const char *val) {
-  strncpy(artist, val, MAX_STRING_SIZE);
-  strncpy(_artist, val, MAX_STRING_SIZE);
-  normalize(_artist);
+  artist = strdup(val);
+  norm_artist = strdup(val);
+  normalize(norm_artist);
   return *this;
 }
 
@@ -304,10 +321,19 @@ Song& Song::setSeconds(const unsigned int val) {
 }
 
 Song& Song::setAlbum(const char *val) {
-  strncpy(album, val, MAX_STRING_SIZE);
-  strncpy(_album, val, MAX_STRING_SIZE);
-  normalize(_album);
+  album = strdup(val);
+  norm_album = strdup(val);
+  normalize(norm_album);
   return *this;
+}
+
+Song::~Song() {
+  free(title);
+  free(norm_title);
+  free(artist);
+  free(norm_artist);
+  free(album);
+  free(norm_album);
 }
 
 Mode strToMode(const char* mode) {

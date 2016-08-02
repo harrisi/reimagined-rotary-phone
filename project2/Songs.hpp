@@ -25,30 +25,26 @@ enum Mode {
 class Song {
 private:
 // private, "normalized" values
-  char _title[MAX_STRING_SIZE];
-  char _artist[MAX_STRING_SIZE];
-  char _album[MAX_STRING_SIZE];
+  char *norm_title;
+  char *norm_artist;
+  char *norm_album;
+  char *title;
+  char *artist;
+  unsigned int minutes; // Although it's highly unlikely, using an int instead
+  // of a char allows for songs longer than 255 minutes.
+  unsigned int seconds; // Seconds are forced into a range of 0-59, which means
+  // the smallest type to contain it is an unsigned char.
+  // Unforunately I don't care to figure out why casting
+  // to an unsigned char in some logic for reading in from
+  // a file is causing issues, so I'm just using an
+  // unsigned int instead. No system running this program
+  // will actually have constrained memory usage.
+  char *album;
   
 // public "consumable" values.
 public: // I don't like having these internal values be public but I don't have
         // time to model it correctly. I need to quit my job.
   size_t index;
-  // I could model this object better and define a destructor that would do all
-  // the cleanup for me for free. This would probably be my favorite approach,
-  // but it would require remodelling the whole program flow, most likely. For
-  // now I will be much more rudimentary.
-  char title[MAX_STRING_SIZE];
-  char artist[MAX_STRING_SIZE];
-  unsigned int minutes; // Although it's highly unlikely, using an int instead
-                        // of a char allows for songs longer than 255 minutes.
-  unsigned int seconds; // Seconds are forced into a range of 0-59, which means
-                        // the smallest type to contain it is an unsigned char.
-                        // Unforunately I don't care to figure out why casting
-                        // to an unsigned char in some logic for reading in from
-                        // a file is causing issues, so I'm just using an
-                        // unsigned int instead. No system running this program
-                        // will actually have constrained memory usage.
-  char album[MAX_STRING_SIZE];
   bool isPopulated;
   Song& setTitle(const char*);
   Song& setArtist(const char*);
@@ -56,18 +52,23 @@ public: // I don't like having these internal values be public but I don't have
   Song& setSeconds(const unsigned int);
   Song& setAlbum(const char*);
   const char* getTitle() const;
+  const char* getNormTitle() const;
   const char* getArtist() const;
-  unsigned int getMinutes();
-  unsigned int getSeconds();
+  const char* getNormArtist() const;
+  unsigned int getMinutes() const;
+  unsigned int getSeconds() const;
   const char* getAlbum() const;
+  const char* getNormAlbum() const;
   void print() const;
+  ~Song();
 };
 
 struct SongDB {
   int items;
-  Song songs[MAX_SONG_DB_SIZE];
+  Song *songs;
   bool print(const int) const;
   bool search(const char*, Song[], const Mode = OTHER) const;
+  SongDB();
   ~SongDB();
 };
 

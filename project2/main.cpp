@@ -266,11 +266,11 @@ void remove(SongDB& song_db) {
   while (++input < song_db.items) {
     // As a consequence of the changes, I can now chain these methods for some
     // neat looking calls. Cool!
-    song_db.songs[input - 1].setTitle(song_db.songs[input].title)
-      .setArtist(song_db.songs[input].artist)
-      .setMinutes(song_db.songs[input].minutes)
-      .setSeconds(song_db.songs[input].seconds)
-      .setAlbum(song_db.songs[input].album);
+    song_db.songs[input - 1].setTitle(song_db.songs[input].getTitle())
+      .setArtist(song_db.songs[input].getArtist())
+      .setMinutes(song_db.songs[input].getMinutes())
+      .setSeconds(song_db.songs[input].getSeconds())
+      .setAlbum(song_db.songs[input].getAlbum());
   }
   song_db.songs[--song_db.items].isPopulated = false;
 }
@@ -453,7 +453,6 @@ void search(const SongDB& song_db, std::istream& stream) { // should return some
         if (startOf) { // If ':' is the first character, it's a command. Use
                        // lookahead as the command.
           doCommand(lookahead);
-          //goto lol;
           stream.clear();
           stream.ignore();
           return;
@@ -540,8 +539,7 @@ void loadFile(SongDB& song_db, const char *delim) {
   }
   
   // Rewrite. Much nicer, although a bit flimsy.
-  while (f.getline(in, std::numeric_limits<std::streamsize>::max()) &&
-         song_db.items <= MAX_SONG_DB_SIZE) {
+  while (f.getline(in, std::numeric_limits<std::streamsize>::max())) {
     if (f.eof()) break;
     token = strtok(in, delim);
     song_db.songs[song_db.items].setTitle(token);
